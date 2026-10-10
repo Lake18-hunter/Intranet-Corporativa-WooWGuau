@@ -1,0 +1,237 @@
+/* Variables de Colores y Tipografía WooWGuau */
+:root {
+    --primary-color: #FF7A00;       /* Naranja vibrante para acciones principales */
+    --primary-hover: #E06B00;       /* Naranja más oscuro al pasar el cursor */
+    --secondary-color: #4A90E2;     /* Azul amigable de acento */
+    --bg-gradient-start: #FFF9F2;  /* Fondo cálido cremoso */
+    --bg-gradient-end: #FFEEDD;
+    --card-bg: #FFFFFF;             /* Blanco puro para la tarjeta */
+    --text-primary: #2D3748;        /* Gris oscuro para lectura clara */
+    --text-secondary: #718096;      /* Gris medio para subtítulos y placeholders */
+    --border-color: #E2E8F0;        /* Borde suave */
+    --border-focus: #FF7A00;        /* Borde al enfocar */
+    --font-heading: 'Fredoka', cursive, sans-serif;
+    --font-body: 'Nunito', sans-serif;
+}
+
+/* Reset y Estilos Globales */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-body);
+    background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    color: var(--text-primary);
+}
+
+/* Tarjeta Principal de Login */
+.login-card {
+    background: var(--card-bg);
+    width: 100%;
+    max-width: 420px;
+    padding: 40px 32px;
+    border-radius: 24px;
+    box-shadow: 0 10px 25px -5px rgba(255, 122, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(255, 122, 0, 0.15);
+}
+
+/* Header y Logo */
+.header {
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+.logo-box {
+    width: 64px;
+    height: 64px;
+    background-color: #FFF3E6;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+
+.logo-icon {
+    width: 36px;
+    height: 36px;
+    color: var(--primary-color);
+}
+
+.header h1 {
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    color: var(--primary-color);
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+}
+
+.subtitle {
+    font-size: 0.92rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+/* Grupos de Formularios e Inputs */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.88rem;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 14px;
+    width: 20px;
+    height: 20px;
+    color: var(--text-secondary);
+    pointer-events: none;
+}
+
+.input-wrapper input {
+    width: 100%;
+    padding: 12px 16px 12px 44px;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    outline: none;
+    transition: all 0.2s ease;
+    background-color: #FAFAFA;
+}
+
+.input-wrapper input:focus {
+    border-color: var(--border-focus);
+    background-color: #FFFFFF;
+    box-shadow: 0 0 0 3px rgba(255, 122, 0, 0.15);
+}
+
+.toggle-password {
+    position: absolute;
+    right: 12px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+}
+
+.toggle-password:hover {
+    color: var(--primary-color);
+}
+
+/* Opciones: Recordar sesión y recuperar contraseña */
+.options-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    margin-bottom: 24px;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    color: var(--text-secondary);
+}
+
+.remember-me input[type="checkbox"] {
+    accent-color: var(--primary-color);
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.forgot-link {
+    color: var(--secondary-color);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.forgot-link:hover {
+    text-decoration: underline;
+}
+
+/* Botón Principal */
+.btn-submit {
+    width: 100%;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 12px;
+    font-family: var(--font-heading);
+    font-size: 1.05rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.btn-submit:hover {
+    background-color: var(--primary-hover);
+}
+
+.btn-submit:active {
+    transform: scale(0.98);
+}
+
+/* Mensaje de Confirmación */
+.status-message {
+    margin-top: 16px;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    text-align: center;
+    display: none;
+}
+
+.status-message.success {
+    background-color: #DEF7EC;
+    color: #03543F;
+}
+
+/* Footer / Enlace de Registro */
+.footer-links {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+}
+
+.footer-links a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 700;
+}
+
+.footer-links a:hover {
+    text-decoration: underline;
+}
