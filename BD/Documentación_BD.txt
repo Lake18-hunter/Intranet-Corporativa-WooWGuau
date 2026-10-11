@@ -1,19 +1,13 @@
 se utilizo Motor de BD: MySQL Server 8.0 (InnoDB)
 
-1. INTRODUCCION Y JUSTIFICACION
-La base de datos relacional 'woowguau_db' fue diseñada para dar
-soporte a la intranet corporativa de WOOWguau, centralizando la
-información del personal y el catálogo de inventario.
-
-Principios de los Diseños Aplicados:
+Principios aplicados en el diseño:
 * Motor InnoDB: Garantiza el cumplimiento de propiedades ACID y el soporte nativo de llaves foráneas (FOREIGN KEY).
 * Cotejamiento utf8mb4_spanish_ci: Permite el almacenamiento de caracteres en español (acentos, ñ) y búsquedas insensibles a mayúsculas.
 * Normalización en 3FN: Separa los catálogos (tipos_especie, categorias_producto, marcas_comerciales) de los datos transaccionales.
 * Preparado para la subida a la Nube: Compatible con Microsoft Azure Database for MySQL.
 
-2. DICCIONARIO DE DATOS EXACTO
+2. DICCIONARIO DE DATOS EXACTO (Para que el profe no nos mate si nos pregunta)
 
-2.1 Módulos de Catálogos y Seguridad
 TABLA: roles_usuario
 - id_rol (INT, NOT NULL, PK, AUTO_INCREMENT): Identificador único del rol.
 - nombre_rol (VARCHAR(30), NOT NULL, UNIQUE): Nombre del rol ('Administrador', 'Empleado').
@@ -31,7 +25,6 @@ TABLA: usuarios_sistema
 - fecha_alta (DATETIME, DEFAULT CURRENT_TIMESTAMP): Fecha de alta.
 - fecha_modificacion (DATETIME, DEFAULT CURRENT_TIMESTAMP ON UPDATE): Última modificación.
 
- 2.2 Módulo de Recursos Humanos
 TABLA: expediente_empleados
 - id_empleado (INT, NOT NULL, PK, AUTO_INCREMENT): Identificador del expediente.
 - id_usuario (INT, NULL, FK -> usuarios_sistema, UNIQUE): Enlace a cuenta de acceso.
@@ -46,7 +39,6 @@ TABLA: expediente_empleados
 - fecha_alta (DATETIME, DEFAULT CURRENT_TIMESTAMP): Fecha de registro.
 - fecha_modificacion (DATETIME, DEFAULT CURRENT_TIMESTAMP ON UPDATE): Última actualización.
 
-2.3 Módulo de Inventario
 TABLA: tipos_especie
 - id_especie (INT, NOT NULL, PK, AUTO_INCREMENT): Identificador de la especie.
 - nombre_especie (VARCHAR(30), NOT NULL, UNIQUE): Nombre ('Perro', 'Gato', 'Otros').
@@ -75,7 +67,7 @@ TABLA: inventario_productos
 - fecha_modificacion (DATETIME, DEFAULT CURRENT_TIMESTAMP ON UPDATE): Última actualización.
 
 
-3. REGLAS DE INTEGRIDAD Y RESTRICCIONES
+3. Reglas de integridad y sus respectivas restricciones
 
 1. fk_usuarios_roles: ON DELETE RESTRICT ON UPDATE CASCADE.
    Impide eliminar roles con usuarios vinculados.
