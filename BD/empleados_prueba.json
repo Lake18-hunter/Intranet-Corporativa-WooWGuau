@@ -1,0 +1,12 @@
+[
+  {
+    "numero_empleado": "EMP001",
+    "nombre_empleado": "Yessica",
+    "apellido_paterno": "Gonzalez",
+    "apellido_materno": "Garcia",
+    "telefono_contacto": "5551234567",
+    "puesto_trabajo": "Gerente",
+    "fecha_ingreso": "2026-01-15",
+    "correo_usuario": "yessica.ipn@gmail.com"
+  }
+]
