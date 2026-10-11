@@ -1,0 +1,86 @@
+se utilizo Motor de BD: MySQL Server 8.0 (InnoDB)
+
+1. INTRODUCCION Y JUSTIFICACION
+La base de datos relacional 'woowguau_db' fue diseñada para dar
+soporte a la intranet corporativa de WOOWguau, centralizando la
+información del personal y el catálogo de inventario.
+
+Principios de los Diseños Aplicados:
+* Motor InnoDB: Garantiza el cumplimiento de propiedades ACID y el soporte nativo de llaves foráneas (FOREIGN KEY).
+* Cotejamiento utf8mb4_spanish_ci: Permite el almacenamiento de caracteres en español (acentos, ñ) y búsquedas insensibles a mayúsculas.
+* Normalización en 3FN: Separa los catálogos (tipos_especie, categorias_producto, marcas_comerciales) de los datos transaccionales.
+* Preparado para la subida a la Nube: Compatible con Microsoft Azure Database for MySQL.
+
+2. DICCIONARIO DE DATOS EXACTO
+
+2.1 Módulos de Catálogos y Seguridad
+TABLA: roles_usuario
+- id_rol (INT, NOT NULL, PK, AUTO_INCREMENT): Identificador único del rol.
+- nombre_rol (VARCHAR(30), NOT NULL, UNIQUE): Nombre del rol ('Administrador', 'Empleado').
+- descripcion_rol (VARCHAR(150), NULL): Descripción de los permisos.
+- fecha_registro (DATETIME, DEFAULT CURRENT_TIMESTAMP): Fecha de creación.
+
+TABLA: usuarios_sistema
+- id_usuario (INT, NOT NULL, PK, AUTO_INCREMENT): Identificador único de usuario.
+- nombre_usuario (VARCHAR(50), NOT NULL, UNIQUE): Nombre para inicio de sesión.
+- correo (VARCHAR(100), NOT NULL, UNIQUE): Correo de contacto (cuentas Gmail).
+- hash_contrasena (VARCHAR(255), NOT NULL): Clave de acceso encriptada (hash).
+- id_rol (INT, NOT NULL, FK -> roles_usuario): Referencia al rol asignado.
+- estatus_cuenta (TINYINT(1), DEFAULT 1): Estado (1 = Activa, 0 = Inactiva).
+- fecha_ultimo_acceso (DATETIME, NULL): Fecha del último inicio de sesión.
+- fecha_alta (DATETIME, DEFAULT CURRENT_TIMESTAMP): Fecha de alta.
+- fecha_modificacion (DATETIME, DEFAULT CURRENT_TIMESTAMP ON UPDATE): Última modificación.
+
+ 2.2 Módulo de Recursos Humanos
+TABLA: expediente_empleados
+- id_empleado (INT, NOT NULL, PK, AUTO_INCREMENT): Identificador del expediente.
+- id_usuario (INT, NULL, FK -> usuarios_sistema, UNIQUE): Enlace a cuenta de acceso.
+- numero_empleado (VARCHAR(15), NOT NULL, UNIQUE): Código interno del trabajador.
+- nombre_empleado (VARCHAR(50), NOT NULL): Nombre(s) del trabajador.
+- apellido_paterno (VARCHAR(50), NOT NULL): Apellido paterno.
+- apellido_materno (VARCHAR(50), NULL): Apellido materno.
+- telefono_contacto (VARCHAR(15), NULL): Teléfono de contacto.
+- puesto_trabajo (VARCHAR(50), NOT NULL): Puesto o cargo en la sucursal.
+- fecha_ingreso (DATE, NOT NULL): Fecha de contratación.
+- estatus_laboral (ENUM('Activo', 'Inactivo', 'Baja Logica'), DEFAULT 'Activo'): Estado laboral.
+- fecha_alta (DATETIME, DEFAULT CURRENT_TIMESTAMP): Fecha de registro.
+- fecha_modificacion (DATETIME, DEFAULT CURRENT_TIMESTAMP ON UPDATE): Última actualización.
+
+2.3 Módulo de Inventario
+TABLA: tipos_especie
+- id_especie (INT, NOT NULL, PK, AUTO_INCREMENT): Identificador de la especie.
+- nombre_especie (VARCHAR(30), NOT NULL, UNIQUE): Nombre ('Perro', 'Gato', 'Otros').
+
+TABLA: categorias_producto
+- id_categoria (INT, NOT NULL, PK, AUTO_INCREMENT): Identificador de la categoría.
+- nombre_categoria (VARCHAR(50), NOT NULL, UNIQUE): Nombre ('Alimento Seco', 'Accesorios', etc.).
+- descripcion_categoria (VARCHAR(150), NULL): Descripción de la línea.
+
+TABLA: marcas_comerciales
+- id_marca (INT, NOT NULL, PK, AUTO_INCREMENT): Identificador de la marca.
+- nombre_marca (VARCHAR(50), NOT NULL, UNIQUE): Nombre comercial de la marca.
+
+TABLA: inventario_productos
+- id_producto (INT, NOT NULL, PK, AUTO_INCREMENT): Identificador del producto.
+- codigo_sku (VARCHAR(30), NOT NULL, UNIQUE): Código SKU único.
+- nombre_producto (VARCHAR(100), NOT NULL): Nombre comercial del producto.
+- descripcion_producto (TEXT, NULL): Descripción detallada.
+- precio_publico (DECIMAL(10,2), NOT NULL): Precio de venta.
+- stock_actual (INT, NOT NULL, DEFAULT 0, CHECK stock_actual >= 0): Cantidad física.
+- id_especie (INT, NOT NULL, FK -> tipos_especie): Referencia a especie.
+- id_categoria (INT, NOT NULL, FK -> categorias_producto): Referencia a categoría.
+- id_marca (INT, NOT NULL, FK -> marcas_comerciales): Referencia a marca.
+- estatus_producto (TINYINT(1), DEFAULT 1): Estado (1 = Activo, 0 = Inactivo).
+- fecha_alta (DATETIME, DEFAULT CURRENT_TIMESTAMP): Fecha de registro.
+- fecha_modificacion (DATETIME, DEFAULT CURRENT_TIMESTAMP ON UPDATE): Última actualización.
+
+
+3. REGLAS DE INTEGRIDAD Y RESTRICCIONES
+
+1. fk_usuarios_roles: ON DELETE RESTRICT ON UPDATE CASCADE.
+   Impide eliminar roles con usuarios vinculados.
+2. fk_empleados_usuarios: ON DELETE SET NULL ON UPDATE CASCADE.
+   Mantiene el historial del empleado si se elimina su cuenta de usuario.
+3. fk_productos_especie, fk_productos_categoria, fk_productos_marca: ON DELETE RESTRICT ON UPDATE CASCADE. Impide borrar catálogos vinculados a mercancía.
+4. CONSTRAINT chk_stock_valido CHECK (stock_actual >= 0): Impide registrar inventario negativo desde el motor de base de datos.
+5. ENUM('Activo', 'Inactivo', 'Baja Logica'): Aplica baja lógica para no eliminar fisicamente el expediente del trabajador.
