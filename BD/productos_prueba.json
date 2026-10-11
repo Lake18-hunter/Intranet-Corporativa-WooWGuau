@@ -1,0 +1,29 @@
+[
+  {
+    "codigo_sku": "ALM-PER-001",
+    "nombre_producto": "Nupec Adulto Raza Mediana 15kg",
+    "precio_publico": 1250.00,
+    "stock_actual": 20,
+    "id_especie": 1,
+    "id_categoria": 1,
+    "id_marca": 3
+  },
+  {
+    "codigo_sku": "ALM-GAT-001",
+    "nombre_producto": "Minimo Adulto 1.5kg",
+    "precio_publico": 480.00,
+    "stock_actual": 15,
+    "id_especie": 2,
+    "id_categoria": 1,
+    "id_marca": 1
+  },
+  {
+    "codigo_sku": "ACC-MUL-001",
+    "nombre_producto": "Plato Doble Antideslizante",
+    "precio_publico": 120.00,
+    "stock_actual": 30,
+    "id_especie": 3,
+    "id_categoria": 3,
+    "id_marca": 4
+  }
+]
