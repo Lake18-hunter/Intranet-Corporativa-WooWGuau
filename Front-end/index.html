@@ -13,6 +13,7 @@
     <!-- Enlace a la hoja de estilos externa -->
     <link rel="stylesheet" href="styles.css">
 </head>
+<script src="formulario.js"></script>
 <body>
     <div class="login-card">
         <!-- Encabezado y Logo WooWGuau -->
@@ -25,7 +26,7 @@
         </div>
 
         <!-- Formulario de Inicio de Sesión -->
-        <form id="loginForm" onsubmit="event.preventDefault(); handleLogin();">
+        <form id="loginForm" handleLogin();">
             <!-- Campo Correo -->
             <div class="form-group">
                 <label for="email">Correo Electrónico</label>
