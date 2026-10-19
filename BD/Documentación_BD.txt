@@ -1,4 +1,4 @@
-se utilizo Motor de BD: MySQL Server 8.0 (InnoDB)
+se utilizo Motor de BD: MySQL Server 8.0 (InnoDB) y esta configurada con el juego de caracteres utf8mb4_spanish_ci.
 
 Principios aplicados en el diseño:
 * Motor InnoDB: Garantiza el cumplimiento de propiedades ACID y el soporte nativo de llaves foráneas (FOREIGN KEY).
