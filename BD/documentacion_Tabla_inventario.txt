@@ -1,0 +1,32 @@
+Documentación
+Para organizar los artículos de la intranet de la tienda, se aplicó un proceso de normalización (3FN) separando las características generales en tablas de catálogos independientes:
+•	Normalización de Catálogos: En lugar de repetir nombres de especies, marcas o categorías como texto plano en cada producto, creamos las tablas tipos_especie, categorias_producto y marcas_comerciales. Esto evita redundancias y limpia la base de datos. 
+•	Control de Stock y Precios: Se utiliza DECIMAL(10,2) en el precio para evitar problemas de redondeo con centavos, y un CHECK en el stock para que la base de datos nunca permita inventarios con valores menores a cero. 
+•	Identificación Única por SKU: Se incluye la columna codigo_sku con restricción de unicidad (UNIQUE) para asegurar la búsqueda rápida de productos mediante códigos de barras o claves internas. 
+
+  Estructura de las Tablas del Módulo
+Catálogos Base (tipos_especie, categorias_producto, marcas_comerciales)
+•	id_especie / id_categoria / id_marca (INT, No nulo, Llave primaria, Autoincrementable): Identificadores únicos de cada catálogo. 
+•	nombre_especie / nombre_categoria / nombre_marca (VARCHAR, No nulo, Único): Nombre comercial o clasificación (ej. Perro, Alimento Seco, Pro Plan). 
+
+  Tabla Principal: inventario_productos
+Guarda el catálogo general de productos en existencia. 
+•	id_producto (INT, No nulo, Llave primaria, Autoincrementable): Identificador único del producto. 
+•	codigo_sku (VARCHAR(30), No nulo, Único): Código interno o SKU del producto. 
+•	nombre_producto (VARCHAR(100), No nulo): Nombre del artículo. 
+•	descripcion_producto (TEXT, Nulo): Detalle o especificaciones adicionales del producto. 
+•	precio_publico (DECIMAL(10,2), No nulo): Precio de venta al público con decimales exactos. 
+•	stock_actual (INT, No nulo, Valor por defecto: 0): Cantidad de piezas disponibles en tienda/almacén. 
+•	id_especie (INT, No nulo, Llave foránea): Relación con la especie a la que va dirigida (tipos_especie). 
+•	id_categoria (INT, No nulo, Llave foránea): Relación con la categoría correspondiente (categorias_producto). 
+•	id_marca (INT, No nulo, Llave foránea): Relación con la marca comercial del artículo (marcas_comerciales). 
+•	estatus_producto (TINYINT(1), Valor por defecto: 1): Estado del producto (1 activo para venta, 0 descontinuado/inactivo). 
+•	fecha_alta (DATETIME, Valor por defecto: fecha actual): Registro de creación en el sistema. 
+•	fecha_modificacion (DATETIME, Se actualiza automáticamente): Fecha del último cambio o actualización de inventario. 
+
+    Reglas de Integridad y Validación
+•	Llaves Foráneas (fk_productos_especie, fk_productos_categoria, fk_productos_marca):
+Todas configuradas con ON DELETE RESTRICT ON UPDATE CASCADE. Esto impide eliminar accidentalmente una especie, categoría o marca del catálogo si todavía existen productos registrados bajo esa clasificación. 
+•	Validación de Inventario (chk_stock_valido):
+Restricción CHECK (stock_actual >= 0) que rechaza de forma automática cualquier intento de actualización o venta que intente dejar las existencias en números negativos. 
+
