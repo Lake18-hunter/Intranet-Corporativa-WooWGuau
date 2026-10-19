@@ -1,0 +1,49 @@
+Documentación 
+Para este módulo se diseñaron las tablas necesarias para manejar el acceso al sistema y el expediente del personal, tomando en cuenta las siguientes decisiones:
+	Separación de Roles: Creamos la tabla roles_usuario de forma independiente para controlar los permisos de los usuarios (como Administrador o Empleado) y poder agregar más roles a futuro sin mover la estructura principal.
+	Relación Usuario - Empleado: Separamos la cuenta de acceso (usuarios_sistema) del expediente del trabajador (expediente_empleados). La relación es opcional (1:1), lo que permite registrar empleados que no necesariamente necesiten un usuario para entrar al sistema.
+	Seguridad en Contraseñas: El campo hash_contrasena tiene una longitud de VARCHAR(255) para que la aplicación en el backend guarde las contraseñas encriptadas (usando librerías como Bcrypt) y no en texto plano.
+	Baja Lógica: En lugar de borrar a los empleados de la base de datos cuando dejan de trabajar, la columna estatus_laboral incluye la opción 'Baja Logica' para conservar el historial de la empresa.
+
+Estructura de las Tablas
+
+Tabla: roles_usuario
+Guarda el catálogo de roles disponibles en la intranet.
+	id_rol (INT, No nulo, Llave primaria, Autoincrementable): Identificador del rol.
+	nombre_rol (VARCHAR(30), No nulo, Único): Nombre del rol (ejemplo: Administrador, Empleado).
+	descripcion_rol (VARCHAR(150), Nulo): Breve descripción de lo que puede hacer el rol.
+	fecha_registro (DATETIME, Valor por defecto: fecha actual): Fecha en que se creó el rol.
+
+Tabla: usuarios_sistema
+Maneja las cuentas de acceso, correos y contraseñas de los usuarios.
+	id_usuario (INT, No nulo, Llave primaria, Autoincrementable): Identificador del usuario.
+	nombre_usuario (VARCHAR(50), No nulo, Único): Nombre de usuario para iniciar sesión.
+	correo (VARCHAR(100), No nulo, Único): Correo del usuario.
+	hash_contrasena (VARCHAR(255), No nulo): Contraseña encriptada proveniente del backend.
+	id_rol (INT, No nulo, Llave foránea): Conecta con la tabla roles_usuario.
+	estatus_cuenta (TINYINT(1), Valor por defecto: 1): Estado de la cuenta (1 activa, 0 inactiva).
+	fecha_ultimo_acceso (DATETIME, Nulo): Guarda la fecha y hora del último inicio de sesión.
+	fecha_alta (DATETIME, Valor por defecto: fecha actual): Fecha de creación de la cuenta.
+	fecha_modificacion (DATETIME, Se actualiza automáticamente): Última fecha de cambio en el registro.
+
+Tabla: expediente_empleados
+Contiene la información personal y laboral de los trabajadores.
+	id_empleado (INT, No nulo, Llave primaria, Autoincrementable): Identificador del expediente.
+	id_usuario (INT, Nulo, Llave foránea, Único): Enlace opcional con la cuenta de usuario.
+	numero_empleado (VARCHAR(15), No nulo, Único): Clave o número de empleado (ejemplo: EMP001).
+	nombre_empleado (VARCHAR(50), No nulo): Nombre o nombres del empleado.
+	apellido_paterno (VARCHAR(50), No nulo): Apellido paterno.
+	apellido_materno (VARCHAR(50), Nulo): Apellido materno.
+	telefono_contacto (VARCHAR(15), Nulo): Teléfono del empleado.
+	puesto_trabajo (VARCHAR(50), No nulo): Puesto que desempeña en la empresa.
+	fecha_ingreso (DATE, No nulo): Fecha en la que ingresó a trabajar.
+	estatus_laboral (ENUM, Valor por defecto: 'Activo'): Opciones disponibles: 'Activo', 'Inactivo', 'Baja Logica'.
+	fecha_alta (DATETIME, Valor por defecto: fecha actual): Fecha de registro en el sistema.
+	fecha_modificacion (DATETIME, Se actualiza automáticamente): Última fecha de modificación.
+
+Reglas de Integridad Referencial
+	En la llave foránea fk_usuarios_roles:
+Se configuró ON DELETE RESTRICT ON UPDATE CASCADE. Esto evita que se borre un rol de la base de datos si hay usuarios que lo tienen asignado actualmente.
+	En la llave foránea fk_empleados_usuarios:
+Se configuró ON DELETE SET NULL ON UPDATE CASCADE. Si por alguna razón se elimina una cuenta de usuario, el expediente del empleado no se borra; simplemente el campo id_usuario cambia a NULL para no perder la información laboral del trabajador.
+
