@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>WooWGuau | Iniciar sesión</title>
+</head>
+<body>
+  <h1>WooWGuau</h1>
+  <form method="post">
+    {% csrf_token %}
+    {% if error %}<p style="color:#c8553d">{{ error }}</p>{% endif %}
+    <label for="usuario">Usuario</label>
+    <input id="usuario" name="usuario" type="text" required>
+    <label for="contrasena">Contraseña</label>
+    <input id="contrasena" name="contrasena" type="password" required>
+    <button type="submit">Iniciar sesión</button>
+  </form>
+</body>
+</html>
