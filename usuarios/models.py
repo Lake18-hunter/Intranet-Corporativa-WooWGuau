@@ -1,3 +1,35 @@
 from django.db import models
+from django.contrib.auth.hashers import check_password
 
-# Create your models here.
+
+class Rol(models.Model):
+    id_rol = models.AutoField(primary_key=True)
+    nombre_rol = models.CharField(max_length=30, unique=True)
+    descripcion_rol = models.CharField(max_length=150, null=True, blank=True)
+
+    class Meta:
+        managed = False            # la tabla la creó BD; Django solo la consulta
+        db_table = "roles_usuario"
+
+    def __str__(self):
+        return self.nombre_rol
+
+
+class UsuarioSistema(models.Model):
+    id_usuario = models.AutoField(primary_key=True)
+    nombre_usuario = models.CharField(max_length=50, unique=True)
+    correo = models.CharField(max_length=100, unique=True)
+    hash_contrasena = models.CharField(max_length=255)   # guarda el hash, nunca texto plano
+    rol = models.ForeignKey(Rol, on_delete=models.PROTECT, db_column="id_rol")
+    estatus_cuenta = models.BooleanField(default=True)   # TINYINT(1): 1 activa, 0 inactiva
+    fecha_ultimo_acceso = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        managed = False
+        db_table = "usuarios_sistema"
+
+    def verificar_contrasena(self, contrasena_plana):
+        return check_password(contrasena_plana, self.hash_contrasena)
+
+    def __str__(self):
+        return f"{self.nombre_usuario} ({self.rol.nombre_rol})"
