@@ -2,6 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods
+from .decorators import rol_requerido
 
 from .models import UsuarioSistema
 
@@ -70,10 +71,13 @@ def logout_view(request):
     return redirect("login")
 
 
-# Vistas provisionales: la siguiente tarea (enrutamiento restrictivo) las reemplaza
+@rol_requerido("admin")
 def panel_admin(request):
-    return HttpResponse("Panel de administrador (provisional)")
+    return render(request, "usuarios/panel_admin.html",
+                  {"nombre": request.session.get("nombre_usuario")})
 
 
+@rol_requerido("empleado")
 def panel_empleado(request):
-    return HttpResponse("Panel de empleado (provisional)")
+    return render(request, "usuarios/panel_empleado.html",
+                  {"nombre": request.session.get("nombre_usuario")})

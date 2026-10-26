@@ -1,0 +1,274 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de Administrador | Empleados</title>
+  <link rel="stylesheet" href="panel_admin.css">
+  <link rel="stylesheet" href="{% static 'usuarios/estilos.css' %}">
+    <script src="{% static 'usuarios/formulario.js' %}"></script>
+</head>
+<script src="panel_admin.js"></script>
+<body>
+
+  <!-- ===================== PANEL PRINCIPAL ===================== -->
+  <main class="panel_admin" id="panel_admin">
+
+    <header class="panel_admin__header">
+      <div>
+        <h1>Panel de Administrador</h1>
+        <p class="panel_admin__subtitle">Gestión de empleados · Acceso exclusivo para el rol <strong>Administrador</strong></p>
+      </div>
+      <a href="#modal-crear" class="btn btn--primary">+ Nuevo empleado</a>
+    </header>
+
+    <!-- Barra de búsqueda y filtros -->
+    <section class="toolbar" aria-label="Filtros">
+      <input type="search" id="buscar" class="toolbar__search" placeholder="Buscar por nombre, correo o puesto…" aria-label="Buscar empleados">
+      <select id="filtro-estado" class="toolbar__select" aria-label="Filtrar por estado">
+        <option value="">Todos los estados</option>
+        <option value="activo">Activo</option>
+        <option value="inactivo">Inactivo</option>
+      </select>
+    </section>
+
+    <!-- ===================== TABLA DE EMPLEADOS ===================== -->
+    <div class="table-wrapper">
+      <table class="data-table" id="tabla-empleados">
+        <caption class="sr-only">Listado de empleados</caption>
+        <thead>
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Nombre</th>
+            <th scope="col">Correo</th>
+            <th scope="col">Puesto</th>
+            <th scope="col">Departamento</th>
+            <th scope="col">Rol</th>
+            <th scope="col">Estado</th>
+            <th scope="col" class="data-table__actions-col">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td data-label="ID">001</td>
+            <td data-label="Nombre">Susie Escobar</td>
+            <td data-label="Correo">susie.escobar@empresa.com</td>
+            <td data-label="Puesto">Gerente de TI</td>
+            <td data-label="Departamento">Tecnología</td>
+            <td data-label="Rol"><span class="badge badge--role">Administrador</span></td>
+            <td data-label="Estado"><span class="badge badge--active">Activo</span></td>
+            <td data-label="Acciones" class="data-table__actions">
+              <a href="#modal-ver" class="btn btn--small btn--ghost">Ver</a>
+              <a href="#modal-editar" class="btn btn--small btn--secondary">Editar</a>
+              <a href="#modal-eliminar" class="btn btn--small btn--danger">Eliminar</a>
+            </td>
+          </tr>
+          <tr>
+            <td data-label="ID">002</td>
+            <td data-label="Nombre">Carlos Ramírez</td>
+            <td data-label="Correo">carlos.ramirez@empresa.com</td>
+            <td data-label="Puesto">Desarrollador</td>
+            <td data-label="Departamento">Tecnología</td>
+            <td data-label="Rol"><span class="badge badge--role">Empleado</span></td>
+            <td data-label="Estado"><span class="badge badge--active">Activo</span></td>
+            <td data-label="Acciones" class="data-table__actions">
+              <a href="#modal-ver" class="btn btn--small btn--ghost">Ver</a>
+              <a href="#modal-editar" class="btn btn--small btn--secondary">Editar</a>
+              <a href="#modal-eliminar" class="btn btn--small btn--danger">Eliminar</a>
+            </td>
+          </tr>
+          <tr>
+            <td data-label="ID">003</td>
+            <td data-label="Nombre">Ana López</td>
+            <td data-label="Correo">ana.lopez@empresa.com</td>
+            <td data-label="Puesto">Analista de RR. HH.</td>
+            <td data-label="Departamento">Recursos Humanos</td>
+            <td data-label="Rol"><span class="badge badge--role">Empleado</span></td>
+            <td data-label="Estado"><span class="badge badge--inactive">Inactivo</span></td>
+            <td data-label="Acciones" class="data-table__actions">
+              <a href="#modal-ver" class="btn btn--small btn--ghost">Ver</a>
+              <a href="#modal-editar" class="btn btn--small btn--secondary">Editar</a>
+              <a href="#modal-eliminar" class="btn btn--small btn--danger">Eliminar</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <footer class="panel_admin__footer">
+      <span>Mostrando 3 de 3 empleados</span>
+      <nav class="pagination" aria-label="Paginación">
+        <a href="#" class="pagination__link pagination__link--disabled">‹ Anterior</a>
+        <a href="#" class="pagination__link pagination__link--current">1</a>
+        <a href="#" class="pagination__link pagination__link--disabled">Siguiente ›</a>
+      </nav>
+    </footer>
+  </main>
+
+  <!-- ===================== MODALES (OCULTOS) =====================
+       Se muestran con :target (sin JavaScript). Para cerrarlos,
+       el enlace apunta a "#admin-panel". Con JS se puede cambiar
+       a la clase .is-open sin tocar el CSS (ver documentación). -->
+
+  <!-- MODAL: Crear empleado -->
+  <div class="modal" id="modal-crear" role="dialog" aria-modal="true" aria-labelledby="titulo-crear">
+    <a href="#panel_admin" class="modal__overlay" aria-label="Cerrar"></a>
+    <div class="modal__content">
+      <header class="modal__header">
+        <h2 id="titulo-crear">Nuevo empleado</h2>
+        <a href="#panel_admin" class="modal__close" aria-label="Cerrar">×</a>
+      </header>
+      <form class="form" id="form-crear" action="#" method="post">
+        <div class="form__grid">
+          <div class="form__group">
+            <label for="crear-nombre">Nombre completo</label>
+            <input type="text" id="crear-nombre" name="nombre" required>
+          </div>
+          <div class="form__group">
+            <label for="crear-correo">Correo electrónico</label>
+            <input type="email" id="crear-correo" name="correo" required>
+          </div>
+          <div class="form__group">
+            <label for="crear-puesto">Puesto</label>
+            <input type="text" id="crear-puesto" name="puesto" required>
+          </div>
+          <div class="form__group">
+            <label for="crear-depto">Departamento</label>
+            <select id="crear-depto" name="departamento" required>
+              <option value="">Seleccionar…</option>
+              <option>Tecnología</option>
+              <option>Recursos Humanos</option>
+              <option>Finanzas</option>
+              <option>Operaciones</option>
+            </select>
+          </div>
+          <div class="form__group">
+            <label for="crear-rol">Rol</label>
+            <select id="crear-rol" name="rol" required>
+              <option value="empleado">Empleado</option>
+              <option value="administrador">Administrador</option>
+            </select>
+          </div>
+          <div class="form__group">
+            <label for="crear-estado">Estado</label>
+            <select id="crear-estado" name="estado">
+              <option value="activo">Activo</option>
+              <option value="inactivo">Inactivo</option>
+            </select>
+          </div>
+          <div class="form__group form__group--full">
+            <label for="crear-password">Contraseña temporal</label>
+            <input type="password" id="crear-password" name="password" required minlength="8">
+          </div>
+        </div>
+        <footer class="modal__footer">
+          <a href="#panel_admin" class="btn btn--ghost">Cancelar</a>
+          <button type="submit" class="btn btn--primary">Guardar</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Editar empleado -->
+  <div class="modal" id="modal-editar" role="dialog" aria-modal="true" aria-labelledby="titulo-editar">
+    <a href="#panel_admin" class="modal__overlay" aria-label="Cerrar"></a>
+    <div class="modal__content">
+      <header class="modal__header">
+        <h2 id="titulo-editar">Editar empleado</h2>
+        <a href="#panel_admin" class="modal__close" aria-label="Cerrar">×</a>
+      </header>
+      <form class="form" id="form-editar" action="#" method="post">
+        <input type="hidden" id="editar-id" name="id">
+        <div class="form__grid">
+          <div class="form__group">
+            <label for="editar-nombre">Nombre completo</label>
+            <input type="text" id="editar-nombre" name="nombre" required>
+          </div>
+          <div class="form__group">
+            <label for="editar-correo">Correo electrónico</label>
+            <input type="email" id="editar-correo" name="correo" required>
+          </div>
+          <div class="form__group">
+            <label for="editar-puesto">Puesto</label>
+            <input type="text" id="editar-puesto" name="puesto" required>
+          </div>
+          <div class="form__group">
+            <label for="editar-depto">Departamento</label>
+            <select id="editar-depto" name="departamento" required>
+              <option>Tecnología</option>
+              <option>Recursos Humanos</option>
+              <option>Finanzas</option>
+              <option>Operaciones</option>
+            </select>
+          </div>
+          <div class="form__group">
+            <label for="editar-rol">Rol</label>
+            <select id="editar-rol" name="rol" required>
+              <option value="empleado">Empleado</option>
+              <option value="administrador">Administrador</option>
+            </select>
+          </div>
+          <div class="form__group">
+            <label for="editar-estado">Estado</label>
+            <select id="editar-estado" name="estado">
+              <option value="activo">Activo</option>
+              <option value="inactivo">Inactivo</option>
+            </select>
+          </div>
+        </div>
+        <footer class="modal__footer">
+          <a href="#panel_admin" class="btn btn--ghost">Cancelar</a>
+          <button type="submit" class="btn btn--primary">Guardar cambios</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Ver detalle -->
+  <div class="modal" id="modal-ver" role="dialog" aria-modal="true" aria-labelledby="titulo-ver">
+    <a href="#panel_admin" class="modal__overlay" aria-label="Cerrar"></a>
+    <div class="modal__content">
+      <header class="modal__header">
+        <h2 id="titulo-ver">Detalle del empleado</h2>
+        <a href="#panel_admin" class="modal__close" aria-label="Cerrar">×</a>
+      </header>
+      <dl class="detail">
+        <div><dt>ID</dt><dd id="ver-id">—</dd></div>
+        <div><dt>Nombre</dt><dd id="ver-nombre">—</dd></div>
+        <div><dt>Correo</dt><dd id="ver-correo">—</dd></div>
+        <div><dt>Puesto</dt><dd id="ver-puesto">—</dd></div>
+        <div><dt>Departamento</dt><dd id="ver-depto">—</dd></div>
+        <div><dt>Rol</dt><dd id="ver-rol">—</dd></div>
+        <div><dt>Estado</dt><dd id="ver-estado">—</dd></div>
+      </dl>
+      <footer class="modal__footer">
+        <a href="#panel_admin" class="btn btn--primary">Cerrar</a>
+      </footer>
+    </div>
+  </div>
+
+  <!-- MODAL: Confirmar eliminación -->
+  <div class="modal modal--small" id="modal-eliminar" role="alertdialog" aria-modal="true" aria-labelledby="titulo-eliminar">
+    <a href="#panel_admin" class="modal__overlay" aria-label="Cerrar"></a>
+    <div class="modal__content">
+      <header class="modal__header">
+        <h2 id="titulo-eliminar">Eliminar empleado</h2>
+        <a href="#panel_admin" class="modal__close" aria-label="Cerrar">×</a>
+      </header>
+      <p class="modal__text">
+        ¿Seguro que deseas eliminar a <strong id="eliminar-nombre">este empleado</strong>?
+        Esta acción no se puede deshacer.
+      </p>
+      <form id="form-eliminar" action="#" method="post">
+        <input type="hidden" id="eliminar-id" name="id">
+        <footer class="modal__footer">
+          <a href="#panel_admin" class="btn btn--ghost">Cancelar</a>
+          <button type="submit" class="btn btn--danger-solid">Sí, eliminar</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+</body>
+</html>
