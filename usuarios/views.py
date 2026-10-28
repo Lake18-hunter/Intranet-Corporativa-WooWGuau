@@ -77,7 +77,7 @@ def panel_admin(request):
     return render(request, "usuarios/panel_admin.html",
                   {"nombre": request.session.get("nombre_usuario")})
 
-
+@ensure_csrf_cookie
 @rol_requerido("empleado")
 def panel_empleado(request):
     return render(request, "usuarios/panel_empleado.html",
