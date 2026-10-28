@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 from .decorators import rol_requerido
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 from .models import UsuarioSistema
 
@@ -70,7 +71,7 @@ def logout_view(request):
     request.session.flush()
     return redirect("login")
 
-
+@ensure_csrf_cookie
 @rol_requerido("admin")
 def panel_admin(request):
     return render(request, "usuarios/panel_admin.html",
