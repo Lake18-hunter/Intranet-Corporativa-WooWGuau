@@ -1,5 +1,6 @@
 [
   {
+    "id_usuario": 1,
     "numero_empleado": "EMP001",
     "nombre_empleado": "Yessica",
     "apellido_paterno": "Gonzalez",
@@ -7,6 +8,17 @@
     "telefono_contacto": "5551234567",
     "puesto_trabajo": "Gerente",
     "fecha_ingreso": "2026-01-15",
-    "correo_usuario": "yessica.ipn@gmail.com"
+    "estatus_laboral": "Activo"
+  },
+  {
+    "id_usuario": 2,
+    "numero_empleado": "EMP002",
+    "nombre_empleado": "Juan",
+    "apellido_paterno": "Perez",
+    "apellido_materno": "Lopez",
+    "telefono_contacto": "5559876543",
+    "puesto_trabajo": "Vendedor de Piso",
+    "fecha_ingreso": "2026-02-01",
+    "estatus_laboral": "Activo"
   }
 ]
