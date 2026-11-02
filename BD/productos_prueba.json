@@ -2,28 +2,45 @@
   {
     "codigo_sku": "ALM-PER-001",
     "nombre_producto": "Nupec Adulto Raza Mediana 15kg",
+    "descripcion_producto": "Alimento seco balanceado",
     "precio_publico": 1250.00,
     "stock_actual": 20,
     "id_especie": 1,
     "id_categoria": 1,
-    "id_marca": 3
+    "id_marca": 3,
+    "estatus_producto": 1
   },
   {
     "codigo_sku": "ALM-GAT-001",
-    "nombre_producto": "Minimo Adulto 1.5kg",
+    "nombre_producto": "Royal Canin Cat Kitten 1.5kg",
+    "descripcion_producto": "Alimento para gatitos",
     "precio_publico": 480.00,
-    "stock_actual": 15,
+    "stock_actual": 2,
     "id_especie": 2,
     "id_categoria": 1,
-    "id_marca": 1
+    "id_marca": 1,
+    "estatus_producto": 1
   },
   {
     "codigo_sku": "ACC-MUL-001",
     "nombre_producto": "Plato Doble Antideslizante",
+    "descripcion_producto": "Accesorios de acero",
     "precio_publico": 120.00,
-    "stock_actual": 30,
+    "stock_actual": 0,
     "id_especie": 3,
     "id_categoria": 3,
-    "id_marca": 4
+    "id_marca": 4,
+    "estatus_producto": 1
+  },
+  {
+    "codigo_sku": "HIG-GAT-001",
+    "nombre_producto": "Arena para Gato Scoopable 5kg",
+    "descripcion_producto": "Arena aglutinante",
+    "precio_publico": 250.00,
+    "stock_actual": 15,
+    "id_especie": 2,
+    "id_categoria": 4,
+    "id_marca": 4,
+    "estatus_producto": 1
   }
 ]
