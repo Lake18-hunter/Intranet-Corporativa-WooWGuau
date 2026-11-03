@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Empleado - Inventario | WooWGuau</title>
+    <link rel="stylesheet" href="inventario-empleado.css">
+</head>
+<body>
+    <main class="emp-panel" id="emp-panel">
+        <header class="emp-panel__header">
+            <div>
+                <h1>Inventario de Productos</h1>
+                <p class="emp-panel__subtitle">Control de stock en tiempo real - Alimentos y Accesorios</p>
+            </div>
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <span class="badge badge--role">Rol: Empleado</span>
+                <a href="#modal-crear-producto" class="btn btn--primary">+ Nuevo producto</a>
+            </div>
+        </header>
+
+        <!-- Barra de Filtros -->
+        <form class="toolbar" id="filter-form" method="GET" action="/inventario/productos/">
+            <input type="text" name="q" id="search-input" class="toolbar__search" placeholder="Buscar por SKU, nombre o descripción..." aria-label="Buscar productos">
+            
+            <select name="especie" id="select-especie" class="toolbar__select" aria-label="Filtrar por especie">
+                <option value="">Todas las especies</option>
+                <option value="Perro">Perro</option>
+                <option value="Gato">Gato</option>
+            </select>
+
+            <select name="categoria" id="select-categoria" class="toolbar__select" aria-label="Filtrar por categoría">
+                <option value="">Todas las categorías</option>
+                <option value="Alimento">Alimento</option>
+                <option value="Accesorios">Accesorios</option>
+            </select>
+
+            <select name="marca" id="select-marca" class="toolbar__select" aria-label="Filtrar por marca">
+                <option value="">Todas las marcas</option>
+                <option value="DogChow">DogChow</option>
+                <option value="CatLitter">CatLitter</option>
+            </select>
+
+            <button type="submit" class="btn btn--primary btn--small">Filtrar</button>
+        </form>
+
+        <!-- Tabla de Inventario de Productos -->
+        <div class="table-wrapper">
+            <table class="data-table" id="inventory-table">
+                <thead>
+                    <tr>
+                        <th>SKU</th>
+                        <th>Producto</th>
+                        <th>Especie</th>
+                        <th>Categoría</th>
+                        <th>Marca</th>
+                        <th>Precio</th>
+                        <th>Stock Actual</th>
+                        <th>Control Stock</th>
+                        <th class="data-table__actions-col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="inventory-tbody">
+                    <!-- Datos de prueba estáticos -->
+                    <tr>
+                        <td data-label="SKU"><strong>SKU-PER-001</strong></td>
+                        <td data-label="Producto">Croquetas Premium Adulto 20kg</td>
+                        <td data-label="Especie">Perro</td>
+                        <td data-label="Categoría">Alimento</td>
+                        <td data-label="Marca">DogChow</td>
+                        <td data-label="Precio">$899.00</td>
+                        <td data-label="Stock Actual"><span id="stock-val-1" style="font-weight:700;">15</span></td>
+                        <td data-label="Control Stock">
+                            <div class="stock-control">
+                                <button type="button" class="btn btn--stock btn--stock-minus" onclick="modificarStock(1, 'restar')" title="Restar 1">-</button>
+                                <span class="stock-control__value" id="stock-num-1">15</span>
+                                <button type="button" class="btn btn--stock btn--stock-plus" onclick="modificarStock(1, 'sumar')" title="Sumar 1">+</button>
+                            </div>
+                        </td>
+                        <td data-label="Acciones" class="data-table__actions">
+                            <a href="#modal-ver" class="btn btn--small btn--ghost" onclick="verProducto(1, 'SKU-PER-001', 'Croquetas Premium Adulto 20kg', 'Alimento completo rico en proteínas para perros adultos.', '899.00', '15', 'Perro', 'Alimento', 'DogChow', 'Activo')">Ver</a>
+                            <a href="#modal-editar" class="btn btn--small btn--secondary" onclick="prepararEdicion(1, 'SKU-PER-001', 'Croquetas Premium Adulto 20kg', 'Alimento completo rico en proteínas para perros adultos.', '899.00', 'Perro', 'Alimento', 'DogChow')">Editar</a>
+                            <a href="#modal-eliminar" class="btn btn--small btn--danger" onclick="prepararEliminacion(1, 'Croquetas Premium Adulto 20kg')">Eliminar</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td data-label="SKU"><strong>SKU-GAT-002</strong></td>
+                        <td data-label="Producto">Arena Sanitaria Aglutinante 10kg</td>
+                        <td data-label="Especie">Gato</td>
+                        <td data-label="Categoría">Accesorios</td>
+                        <td data-label="Marca">CatLitter</td>
+                        <td data-label="Precio">$250.00</td>
+                        <td data-label="Stock Actual"><span id="stock-val-2" style="font-weight:700;">8</span></td>
+                        <td data-label="Control Stock">
+                            <div class="stock-control">
+                                <button type="button" class="btn btn--stock btn--stock-minus" onclick="modificarStock(2, 'restar')" title="Restar 1">-</button>
+                                <span class="stock-control__value" id="stock-num-2">8</span>
+                                <button type="button" class="btn btn--stock btn--stock-plus" onclick="modificarStock(2, 'sumar')" title="Sumar 1">+</button>
+                            </div>
+                        </td>
+                        <td data-label="Acciones" class="data-table__actions">
+                            <a href="#modal-ver" class="btn btn--small btn--ghost" onclick="verProducto(2, 'SKU-GAT-002', 'Arena Sanitaria Aglutinante 10kg', 'Arena para gato con control de olores.', '250.00', '8', 'Gato', 'Accesorios', 'CatLitter', 'Activo')">Ver</a>
+                            <a href="#modal-editar" class="btn btn--small btn--secondary" onclick="prepararEdicion(2, 'SKU-GAT-002', 'Arena Sanitaria Aglutinante 10kg', 'Arena para gato con control de olores.', '250.00', 'Gato', 'Accesorios', 'CatLitter')">Editar</a>
+                            <a href="#modal-eliminar" class="btn btn--small btn--danger" onclick="prepararEliminacion(2, 'Arena Sanitaria Aglutinante 10kg')">Eliminar</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <footer class="emp-panel__footer">
+            <span id="result-count">Mostrando 2 productos de prueba</span>
+            <div class="pagination" id="pagination-container"></div>
+        </footer>
+    </main>
+
+    <!-- ===================== MODALES ===================== -->
+
+    <!-- MODAL: Crear producto -->
+    <div class="modal" id="modal-crear-producto" role="dialog" aria-modal="true" aria-labelledby="titulo-crear">
+        <a href="#emp-panel" class="modal__overlay" aria-label="Cerrar"></a>
+        <div class="modal__content">
+            <header class="modal__header">
+                <h2 id="titulo-crear">Registrar nuevo producto</h2>
+                <a href="#emp-panel" class="modal__close" aria-label="Cerrar">×</a>
+            </header>
+            <form class="form" id="form-crear-producto" action="/inventario/productos/" method="POST">
+                <div class="form__grid">
+                    <div class="form__group">
+                        <label for="crear-sku">Código SKU</label>
+                        <input type="text" id="crear-sku" name="codigo_sku" required>
+                    </div>
+                    <div class="form__group">
+                        <label for="crear-nombre">Nombre del producto</label>
+                        <input type="text" id="crear-nombre" name="nombre_producto" required>
+                    </div>
+                    <div class="form__group">
+                        <label for="crear-precio">Precio público</label>
+                        <input type="number" step="0.01" id="crear-precio" name="precio_publico" required>
+                    </div>
+                    <div class="form__group">
+                        <label for="crear-stock">Stock inicial</label>
+                        <input type="number" id="crear-stock" name="stock_actual" value="0" min="0" required>
+                    </div>
+                    <div class="form__group">
+                        <label for="crear-especie">Especie</label>
+                        <select id="crear-especie" name="especie" required>
+                            <option value="">Seleccionar…</option>
+                            <option value="Perro">Perro</option>
+                            <option value="Gato">Gato</option>
+                        </select>
+                    </div>
+                    <div class="form__group">
+                        <label for="crear-categoria">Categoría</label>
+                        <select id="crear-categoria" name="categoria" required>
+                            <option value="">Seleccionar…</option>
+                            <option value="Alimento">Alimento</option>
+                            <option value="Accesorios">Accesorios</option>
+                        </select>
+                    </div>
+                    <div class="form__group form__group--full">
+                        <label for="crear-marca">Marca</label>
+                        <input type="text" id="crear-marca" name="marca" required>
+                    </div>
+                    <div class="form__group form__group--full">
+                        <label for="crear-desc">Descripción</label>
+                        <input type="text" id="crear-desc" name="descripcion_producto">
+                    </div>
+                </div>
+                <footer class="modal__footer">
+                    <a href="#emp-panel" class="btn btn--ghost">Cancelar</a>
+                    <button type="submit" class="btn btn--primary">Guardar</button>
+                </footer>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: Editar producto -->
+    <div class="modal" id="modal-editar" role="dialog" aria-modal="true" aria-labelledby="titulo-editar">
+        <a href="#emp-panel" class="modal__overlay" aria-label="Cerrar"></a>
+        <div class="modal__content">
+            <header class="modal__header">
+                <h2 id="titulo-editar">Editar producto</h2>
+                <a href="#emp-panel" class="modal__close" aria-label="Cerrar">×</a>
+            </header>
+            <form class="form" id="form-editar" action="#" method="POST">
+                <input type="hidden" id="editar-id" name="id_producto">
+                <div class="form__grid">
+                    <div class="form__group">
+                        <label for="editar-sku">Código SKU</label>
+                        <input type="text" id="editar-sku" name="codigo_sku" required>
+                    </div>
+                    <div class="form__group">
+                        <label for="editar-nombre">Nombre del producto</label>
+                        <input type="text" id="editar-nombre" name="nombre_producto" required>
+                    </div>
+                    <div class="form__group">
+                        <label for="editar-precio">Precio público</label>
+                        <input type="number" step="0.01" id="editar-precio" name="precio_publico" required>
+                    </div>
+                    <div class="form__group">
+                        <label for="editar-especie">Especie</label>
+                        <select id="editar-especie" name="especie" required>
+                            <option value="Perro">Perro</option>
+                            <option value="Gato">Gato</option>
+                        </select>
+                    </div>
+                    <div class="form__group">
+                        <label for="editar-categoria">Categoría</label>
+                        <select id="editar-categoria" name="categoria" required>
+                            <option value="Alimento">Alimento</option>
+                            <option value="Accesorios">Accesorios</option>
+                        </select>
+                    </div>
+                    <div class="form__group">
+                        <label for="editar-marca">Marca</label>
+                        <input type="text" id="editar-marca" name="marca" required>
+                    </div>
+                    <div class="form__group form__group--full">
+                        <label for="editar-desc">Descripción</label>
+                        <input type="text" id="editar-desc" name="descripcion_producto">
+                    </div>
+                </div>
+                <footer class="modal__footer">
+                    <a href="#emp-panel" class="btn btn--ghost">Cancelar</a>
+                    <button type="submit" class="btn btn--primary">Guardar cambios</button>
+                </footer>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: Ver detalle -->
+    <div class="modal" id="modal-ver" role="dialog" aria-modal="true" aria-labelledby="titulo-ver">
+        <a href="#emp-panel" class="modal__overlay" aria-label="Cerrar"></a>
+        <div class="modal__content">
+            <header class="modal__header">
+                <h2 id="titulo-ver">Detalle del producto</h2>
+                <a href="#emp-panel" class="modal__close" aria-label="Cerrar">×</a>
+            </header>
+            <dl class="detail">
+                <div><dt>ID</dt><dd id="ver-id">—</dd></div>
+                <div><dt>SKU</dt><dd id="ver-sku">—</dd></div>
+                <div><dt>Nombre</dt><dd id="ver-nombre">—</dd></div>
+                <div><dt>Descripción</dt><dd id="ver-desc">—</dd></div>
+                <div><dt>Precio</dt><dd id="ver-precio">—</dd></div>
+                <div><dt>Stock Actual</dt><dd id="ver-stock">—</dd></div>
+                <div><dt>Especie</dt><dd id="ver-especie">—</dd></div>
+                <div><dt>Categoría</dt><dd id="ver-categoria">—</dd></div>
+                <div><dt>Marca</dt><dd id="ver-marca">—</dd></div>
+                <div><dt>Estatus</dt><dd id="ver-estatus">—</dd></div>
+            </dl>
+            <footer class="modal__footer">
+                <a href="#emp-panel" class="btn btn--primary">Cerrar</a>
+            </footer>
+        </div>
+    </div>
+
+    <!-- MODAL: Confirmar eliminación -->
+    <div class="modal modal--small" id="modal-eliminar" role="alertdialog" aria-modal="true" aria-labelledby="titulo-eliminar">
+        <a href="#emp-panel" class="modal__overlay" aria-label="Cerrar"></a>
+        <div class="modal__content">
+            <header class="modal__header">
+                <h2 id="titulo-eliminar">Eliminar producto</h2>
+                <a href="#emp-panel" class="modal__close" aria-label="Cerrar">×</a>
+            </header>
+            <p class="modal__text">
+                ¿Seguro que deseas eliminar el producto <strong id="eliminar-nombre">este producto</strong>?
+                Esta acción no se puede deshacer.
+            </p>
+            <form id="form-eliminar" action="#" method="POST">
+                <input type="hidden" id="eliminar-id" name="id_producto">
+                <footer class="modal__footer">
+                    <a href="#emp-panel" class="btn btn--ghost">Cancelar</a>
+                    <button type="submit" class="btn btn--danger-solid">Sí, eliminar</button>
+                </footer>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: Alertas del sistema -->
+    <div id="alert-modal" class="modal modal--small">
+        <div class="modal__overlay" onclick="closeAlertModal()"></div>
+        <div class="modal__content">
+            <header class="modal__header">
+                <h2 id="alert-title">Aviso</h2>
+                <a href="#" class="modal__close" onclick="closeAlertModal(); return false;">&times;</a>
+            </header>
+            <p id="alert-message" class="modal__text">Mensaje...</p>
+            <div class="modal__footer">
+                <button type="button" class="btn btn--primary btn--small" onclick="closeAlertModal()">Entendido</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="inventario-empleado.js"></script>
+</body>
+</html>

@@ -46,10 +46,6 @@ document.addEventListener("DOMContentLoaded", function () {
         return campo;
     }
 
-    const horario = crearCampo("editar-horario", "Horario", "text");
-    const edad = crearCampo("editar-edad", "Edad", "number");
-    const direccion = crearCampo("editar-direccion", "Dirección", "text");
-    const telefono = crearCampo("editar-telefono", "Teléfono", "tel");
 
     // Obtener un campo por su identificador
     function campo(id) {
@@ -78,12 +74,6 @@ document.addEventListener("DOMContentLoaded", function () {
         const estado = celdas[6].textContent.trim().toLowerCase();
         campo("editar-estado").value =
             estado.includes("inactivo") ? "inactivo" : "activo";
-
-        // Estos datos no están en la tabla actual, así que empiezan vacíos.
-        horario.value = "";
-        edad.value = "";
-        direccion.value = "";
-        telefono.value = "";
     }
 
     // Abrir el modal al pulsar Editar
@@ -118,11 +108,7 @@ document.addEventListener("DOMContentLoaded", function () {
             puesto: campo("editar-puesto").value.trim(),
             departamento: campo("editar-depto").value,
             rol: campo("editar-rol").value,
-            estado: campo("editar-estado").value,
-            horario: horario.value.trim(),
-            edad: edad.value,
-            direccion: direccion.value.trim(),
-            telefono: telefono.value.trim()
+            estado: campo("editar-estado").value
         };
 
         // Mostrar los datos preparados para comprobar el funcionamiento.
