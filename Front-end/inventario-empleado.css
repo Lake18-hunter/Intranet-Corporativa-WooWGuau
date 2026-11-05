@@ -293,6 +293,18 @@ body {
   box-shadow: 0 0 0 3px rgba(37, 99, 235, .2);
 }
 
+.stock-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.stock-filters .is-active {
+    outline: 2px solid currentColor;
+    font-weight: bold;
+}
+
 /* ---------- Vista de Detalle ---------- */
 .detail { margin: 0; display: grid; gap: 10px; }
 .detail > div {
