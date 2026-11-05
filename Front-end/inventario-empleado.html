@@ -43,7 +43,20 @@
 
             <button type="submit" class="btn btn--primary btn--small">Filtrar</button>
         </form>
+        
+        <div class="stock-filters">
+    <button type="button" class="btn btn--small is-active"
+        data-stock-filter="todos">Todos</button>
 
+    <button type="button" class="btn btn--small"
+        data-stock-filter="disponible">Disponible (> 5)</button>
+
+    <button type="button" class="btn btn--small"
+        data-stock-filter="bajo">Stock bajo (1-5)</button>
+
+    <button type="button" class="btn btn--small"
+        data-stock-filter="agotado">Agotado (0)</button>
+</div>
         <!-- Tabla de Inventario de Productos -->
         <div class="table-wrapper">
             <table class="data-table" id="inventory-table">
