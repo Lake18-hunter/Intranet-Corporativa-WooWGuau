@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de Gerente | Reporte al administrador</title>
+  <link rel="stylesheet" href="gerente-panel.css">
+  <link rel="stylesheet" href="panel-extras.css">
+</head>
+<body>
+
+  <!-- ===================== PANEL PRINCIPAL ===================== -->
+  <main class="mgr-panel" id="mgr-panel">
+
+    <!-- Navegación entre paneles del rol -->
+    <nav class="panel-nav" aria-label="Paneles del gerente">
+      <a href="gerente-personal.html" class="panel-nav__link">Personal</a>
+      <a href="gerente-compras.html" class="panel-nav__link">Compras e inventario</a>
+      <a href="gerente-reporte.html" class="panel-nav__link panel-nav__link--current" aria-current="page">Reporte al administrador</a>
+    </nav>
+
+    <header class="mgr-panel__header">
+      <div>
+        <h1>Reporte al administrador</h1>
+        <p class="mgr-panel__subtitle">Avisa de un error en datos de empleados, en los tuyos o solicita un cambio de contraseña</p>
+      </div>
+      <span class="badge badge--role">Rol: Gerente</span>
+    </header>
+
+    <!-- ===================== FORMULARIO ===================== -->
+    <section class="form-card" aria-labelledby="titulo-form">
+      <h2 class="form-card__title" id="titulo-form">Nuevo reporte</h2>
+      <p class="form-card__intro">El reporte se guarda en el sistema y llega a la bandeja del administrador como <strong>Pendiente</strong>.</p>
+
+      <p class="notice notice--warning">
+        <strong>Seguridad:</strong> nunca escribas tu contraseña (actual ni nueva) en este formulario.
+        El administrador generará una contraseña temporal y te la entregará por un canal seguro.
+      </p>
+
+      <form class="form" id="form-reporte" action="/reportes/gerente/" method="post">
+        <div class="form__grid">
+          <!-- Datos tomados de la sesión: no se teclean -->
+          <div class="form__group">
+            <label for="rep-de">De</label>
+            <input type="text" id="rep-de" name="remitente" value="Laura Méndez (Gerente)" readonly>
+            <p class="form__hint">Se toma de tu sesión.</p>
+          </div>
+          <div class="form__group">
+            <label for="rep-para">Para</label>
+            <input type="text" id="rep-para" name="destinatario" value="Administrador" readonly>
+            <p class="form__hint">El destinatario es siempre el administrador.</p>
+          </div>
+
+          <div class="form__group">
+            <label for="rep-tipo">Tipo de reporte</label>
+            <select id="rep-tipo" name="tipo" required>
+              <option value="">Seleccionar…</option>
+              <option value="datos_empleado">Error en datos de un empleado</option>
+              <option value="datos_propios">Error en mis propios datos</option>
+              <option value="cambio_password">Solicitud de cambio de contraseña</option>
+            </select>
+          </div>
+          <div class="form__group">
+            <label for="rep-empleado">Empleado afectado</label>
+            <select id="rep-empleado" name="id_empleado">
+              <option value="">No aplica</option>
+              <option value="2">Carlos Ramírez · Cajero</option>
+              <option value="3">Ana López · Cajera</option>
+            </select>
+            <p class="form__hint">Solo para «Error en datos de un empleado» o cambio de contraseña de un empleado.</p>
+          </div>
+
+          <div class="form__group form__group--full">
+            <label for="rep-asunto">Asunto</label>
+            <input type="text" id="rep-asunto" name="asunto" maxlength="120" required placeholder="Ej. Correo mal escrito en el expediente">
+          </div>
+          <div class="form__group form__group--full">
+            <label for="rep-descripcion">Descripción</label>
+            <textarea id="rep-descripcion" name="descripcion" rows="5" required placeholder="Indica qué dato está mal y cuál es el valor correcto."></textarea>
+          </div>
+        </div>
+
+        <div class="form__actions">
+          <button type="reset" class="btn btn--ghost">Limpiar</button>
+          <button type="submit" class="btn btn--primary">Enviar al administrador</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ===================== MIS REPORTES ===================== -->
+    <h2 class="subsection-title">Mis reportes enviados</h2>
+
+    <div class="table-wrapper">
+      <table class="data-table" id="tabla-mis-reportes">
+        <caption class="sr-only">Reportes enviados al administrador</caption>
+        <thead>
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Fecha</th>
+            <th scope="col">Tipo</th>
+            <th scope="col">Asunto</th>
+            <th scope="col">Estatus</th>
+            <th scope="col" class="data-table__actions-col">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td data-label="ID">003</td>
+            <td data-label="Fecha">16/11/2026 10:42</td>
+            <td data-label="Tipo"><span class="badge badge--info">Cambio de contraseña</span></td>
+            <td data-label="Asunto">Solicito restablecer mi contraseña</td>
+            <td data-label="Estatus"><span class="badge badge--warning">Pendiente</span></td>
+            <td data-label="Acciones" class="data-table__actions">
+              <a href="#modal-ver" class="btn btn--small btn--ghost">Ver</a>
+            </td>
+          </tr>
+          <tr>
+            <td data-label="ID">002</td>
+            <td data-label="Fecha">15/11/2026 16:05</td>
+            <td data-label="Tipo"><span class="badge badge--role">Datos de un empleado</span></td>
+            <td data-label="Asunto">Correo mal escrito de Carlos Ramírez</td>
+            <td data-label="Estatus"><span class="badge badge--warning">Pendiente</span></td>
+            <td data-label="Acciones" class="data-table__actions">
+              <a href="#modal-ver" class="btn btn--small btn--ghost">Ver</a>
+            </td>
+          </tr>
+          <tr>
+            <td data-label="ID">001</td>
+            <td data-label="Fecha">13/11/2026 09:15</td>
+            <td data-label="Tipo"><span class="badge badge--role">Datos propios</span></td>
+            <td data-label="Asunto">Actualizar mi teléfono de contacto</td>
+            <td data-label="Estatus"><span class="badge badge--success">Atendido</span></td>
+            <td data-label="Acciones" class="data-table__actions">
+              <a href="#modal-ver" class="btn btn--small btn--ghost">Ver</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <footer class="mgr-panel__footer">
+      <span>Mostrando 3 de 3 reportes</span>
+      <nav class="pagination" aria-label="Paginación">
+        <a href="#" class="pagination__link pagination__link--disabled">‹ Anterior</a>
+        <a href="#" class="pagination__link pagination__link--current">1</a>
+        <a href="#" class="pagination__link pagination__link--disabled">Siguiente ›</a>
+      </nav>
+    </footer>
+  </main>
+
+  <!-- ===================== MODALES ===================== -->
+
+  <!-- MODAL: Ver reporte enviado -->
+  <div class="modal" id="modal-ver" role="dialog" aria-modal="true" aria-labelledby="titulo-ver">
+    <a href="#mgr-panel" class="modal__overlay" aria-label="Cerrar"></a>
+    <div class="modal__content">
+      <header class="modal__header">
+        <h2 id="titulo-ver">Detalle del reporte</h2>
+        <a href="#mgr-panel" class="modal__close" aria-label="Cerrar">×</a>
+      </header>
+      <dl class="detail">
+        <div><dt>ID</dt><dd id="ver-id">—</dd></div>
+        <div><dt>Fecha de envío</dt><dd id="ver-fecha">—</dd></div>
+        <div><dt>Tipo</dt><dd id="ver-tipo">—</dd></div>
+        <div><dt>Empleado afectado</dt><dd id="ver-empleado">—</dd></div>
+        <div><dt>Asunto</dt><dd id="ver-asunto">—</dd></div>
+        <div><dt>Descripción</dt><dd id="ver-descripcion">—</dd></div>
+        <div><dt>Estatus</dt><dd id="ver-estatus">—</dd></div>
+        <div><dt>Nota del administrador</dt><dd id="ver-nota">—</dd></div>
+      </dl>
+      <footer class="modal__footer">
+        <a href="#mgr-panel" class="btn btn--primary">Cerrar</a>
+      </footer>
+    </div>
+  </div>
+
+</body>
+</html>

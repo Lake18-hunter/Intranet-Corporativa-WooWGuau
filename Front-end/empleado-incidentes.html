@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Empleado - Incidentes | WooWGuau</title>
+    <link rel="stylesheet" href="inventario-empleado.css">
+    <link rel="stylesheet" href="panel-extras.css">
+</head>
+<body>
+    <main class="emp-panel" id="emp-panel">
+
+        <!-- Navegación entre paneles del rol -->
+        <nav class="panel-nav" aria-label="Paneles del empleado">
+            <a href="inventario-empleado.html" class="panel-nav__link">Inventario y salidas</a>
+            <a href="empleado-incidentes.html" class="panel-nav__link panel-nav__link--current" aria-current="page">Incidentes</a>
+        </nav>
+
+        <header class="emp-panel__header">
+            <div>
+                <h1>Reporte de Incidentes</h1>
+                <p class="emp-panel__subtitle">Notifica un incidente de stock o una situación en la tienda</p>
+            </div>
+            <span class="badge badge--role">Rol: Empleado</span>
+        </header>
+
+        <!-- Formulario de incidente -->
+        <section class="form-card" aria-labelledby="titulo-form">
+            <h2 class="form-card__title" id="titulo-form">Nuevo incidente</h2>
+            <p class="form-card__intro">El gerente verá este reporte. Describe lo ocurrido con el mayor detalle posible.</p>
+
+            <form class="form" id="form-incidente" action="/incidentes/" method="POST">
+                <div class="form__grid">
+                    <div class="form__group">
+                        <label for="inc-reporta">Reportado por</label>
+                        <input type="text" id="inc-reporta" name="reportado_por" value="Carlos Ramírez" readonly>
+                        <p class="form__hint">Se toma de tu sesión.</p>
+                    </div>
+                    <div class="form__group">
+                        <label for="inc-fecha">Fecha y hora del suceso</label>
+                        <input type="datetime-local" id="inc-fecha" name="fecha_incidente" required>
+                    </div>
+
+                    <div class="form__group">
+                        <label for="inc-tipo">Tipo de incidente</label>
+                        <select id="inc-tipo" name="tipo" required>
+                            <option value="">Seleccionar…</option>
+                            <optgroup label="Stock">
+                                <option value="faltante">Faltante de producto</option>
+                                <option value="diferencia">Diferencia entre sistema y stock físico</option>
+                                <option value="danado">Producto dañado</option>
+                                <option value="caducado">Producto caducado</option>
+                            </optgroup>
+                            <optgroup label="Tienda">
+                                <option value="cliente">Situación con un cliente</option>
+                                <option value="instalaciones">Instalaciones o equipo</option>
+                                <option value="otro">Otro</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <div class="form__group">
+                        <label for="inc-gravedad">Gravedad</label>
+                        <select id="inc-gravedad" name="gravedad" required>
+                            <option value="baja">Baja</option>
+                            <option value="media" selected>Media</option>
+                            <option value="alta">Alta</option>
+                        </select>
+                    </div>
+
+                    <div class="form__group">
+                        <label for="inc-producto">Producto relacionado (opcional)</label>
+                        <select id="inc-producto" name="id_producto">
+                            <option value="">Ninguno</option>
+                            <option value="1">SKU-PER-001 · Croquetas Premium Adulto 20kg</option>
+                            <option value="2">SKU-GAT-002 · Arena Sanitaria Aglutinante 10kg</option>
+                        </select>
+                    </div>
+                    <div class="form__group">
+                        <label for="inc-cantidad">Cantidad afectada (opcional)</label>
+                        <input type="number" id="inc-cantidad" name="cantidad_afectada" min="0" step="1">
+                    </div>
+
+                    <div class="form__group form__group--full">
+                        <label for="inc-descripcion">Descripción</label>
+                        <textarea id="inc-descripcion" name="descripcion" rows="4" required placeholder="¿Qué pasó? ¿Dónde? ¿Quién estuvo presente?"></textarea>
+                    </div>
+                </div>
+
+                <div class="form__actions">
+                    <button type="reset" class="btn btn--ghost">Limpiar</button>
+                    <button type="submit" class="btn btn--primary">Enviar incidente</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Historial de mis incidentes -->
+        <h2 class="subsection-title">Mis incidentes recientes</h2>
+
+        <div class="table-wrapper">
+            <table class="data-table" id="tabla-incidentes">
+                <caption class="sr-only">Incidentes registrados por mí</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Fecha</th>
+                        <th scope="col">Tipo</th>
+                        <th scope="col">Producto</th>
+                        <th scope="col">Gravedad</th>
+                        <th scope="col">Estatus</th>
+                        <th scope="col" class="data-table__actions-col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="incidentes-tbody">
+                    <!-- Datos de prueba estáticos -->
+                    <tr>
+                        <td data-label="ID">012</td>
+                        <td data-label="Fecha">16/11/2026 09:30</td>
+                        <td data-label="Tipo">Producto dañado</td>
+                        <td data-label="Producto">Arena Sanitaria Aglutinante 10kg</td>
+                        <td data-label="Gravedad"><span class="badge badge--warning">Media</span></td>
+                        <td data-label="Estatus"><span class="badge badge--warning">Enviado</span></td>
+                        <td data-label="Acciones" class="data-table__actions">
+                            <a href="#modal-ver" class="btn btn--small btn--ghost">Ver</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td data-label="ID">009</td>
+                        <td data-label="Fecha">14/11/2026 18:10</td>
+                        <td data-label="Tipo">Diferencia de stock</td>
+                        <td data-label="Producto">Croquetas Premium Adulto 20kg</td>
+                        <td data-label="Gravedad"><span class="badge badge--danger">Alta</span></td>
+                        <td data-label="Estatus"><span class="badge badge--success">Revisado</span></td>
+                        <td data-label="Acciones" class="data-table__actions">
+                            <a href="#modal-ver" class="btn btn--small btn--ghost">Ver</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <footer class="emp-panel__footer">
+            <span id="result-count">Mostrando 2 incidentes</span>
+            <div class="pagination" id="pagination-container"></div>
+        </footer>
+    </main>
+
+    <!-- ===================== MODALES ===================== -->
+
+    <!-- MODAL: Ver incidente -->
+    <div class="modal" id="modal-ver" role="dialog" aria-modal="true" aria-labelledby="titulo-ver">
+        <a href="#emp-panel" class="modal__overlay" aria-label="Cerrar"></a>
+        <div class="modal__content">
+            <header class="modal__header">
+                <h2 id="titulo-ver">Detalle del incidente</h2>
+                <a href="#emp-panel" class="modal__close" aria-label="Cerrar">×</a>
+            </header>
+            <dl class="detail">
+                <div><dt>ID</dt><dd id="ver-id">—</dd></div>
+                <div><dt>Fecha del suceso</dt><dd id="ver-fecha">—</dd></div>
+                <div><dt>Tipo</dt><dd id="ver-tipo">—</dd></div>
+                <div><dt>Producto</dt><dd id="ver-producto">—</dd></div>
+                <div><dt>Cantidad afectada</dt><dd id="ver-cantidad">—</dd></div>
+                <div><dt>Gravedad</dt><dd id="ver-gravedad">—</dd></div>
+                <div><dt>Descripción</dt><dd id="ver-descripcion">—</dd></div>
+                <div><dt>Estatus</dt><dd id="ver-estatus">—</dd></div>
+            </dl>
+            <footer class="modal__footer">
+                <a href="#emp-panel" class="btn btn--primary">Cerrar</a>
+            </footer>
+        </div>
+    </div>
+
+</body>
+</html>

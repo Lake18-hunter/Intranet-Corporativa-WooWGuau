@@ -1,0 +1,44 @@
+/* =====================================================
+   Panel de Gerente – Estilos base
+   Reutiliza TODO el sistema de diseño de admin-panel.css
+   (botones, tabla, modales, formularios, badges, paginación)
+   y solo define el contenedor propio del rol: .mgr-panel
+   ===================================================== */
+@import url("admin-panel.css");
+
+/* ---------- Contenedor del panel ---------- */
+.mgr-panel {
+  max-width: 1200px;
+  margin: 32px auto;
+  padding: 24px;
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.mgr-panel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.mgr-panel__header h1 { margin: 0; font-size: 1.6rem; }
+.mgr-panel__subtitle { margin: 4px 0 0; color: var(--color-muted); font-size: .9rem; }
+
+.mgr-panel__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 16px;
+  color: var(--color-muted);
+  font-size: .85rem;
+}
+
+@media (max-width: 720px) {
+  .mgr-panel { margin: 0; padding: 16px; border-radius: 0; }
+}

@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de Gerente | Compras e inventario</title>
+  <link rel="stylesheet" href="gerente-panel.css">
+  <link rel="stylesheet" href="panel-extras.css">
+</head>
+<body>
+
+  <!-- ===================== PANEL PRINCIPAL ===================== -->
+  <main class="mgr-panel" id="mgr-panel">
+
+    <!-- Navegación entre paneles del rol -->
+    <nav class="panel-nav" aria-label="Paneles del gerente">
+      <a href="gerente-personal.html" class="panel-nav__link">Personal</a>
+      <a href="gerente-compras.html" class="panel-nav__link panel-nav__link--current" aria-current="page">Compras e inventario</a>
+      <a href="gerente-reporte.html" class="panel-nav__link">Reporte al administrador</a>
+    </nav>
+
+    <header class="mgr-panel__header">
+      <div>
+        <h1>Compras e inventario</h1>
+        <p class="mgr-panel__subtitle">Proveedores, órdenes de compra, precios, stock y corte de caja · Acceso para el rol <strong>Gerente</strong></p>
+      </div>
+      <span class="badge badge--role">Rol: Gerente</span>
+    </header>
+
+    <!-- Resumen -->
+    <section class="summary" aria-label="Resumen">
+      <article class="summary__card">
+        <p class="summary__label">Órdenes abiertas</p>
+        <p class="summary__value" id="resumen-ordenes">2</p>
+        <p class="summary__hint">Borrador o enviadas</p>
+      </article>
+      <article class="summary__card summary__card--warning">
+        <p class="summary__label">Stock bajo</p>
+        <p class="summary__value" id="resumen-stock-bajo">1</p>
+        <p class="summary__hint">Igual o menor al mínimo</p>
+      </article>
+      <article class="summary__card summary__card--success">
+        <p class="summary__label">Ventas de hoy</p>
+        <p class="summary__value" id="resumen-ventas">$2,448.00</p>
+        <p class="summary__hint">Según precio público</p>
+      </article>
+    </section>
+
+    <!-- ===================== PESTAÑAS (solo CSS) ===================== -->
+    <div class="tabs">
+      <input type="radio" name="tab-compras" id="tab-ordenes" class="tabs__radio" checked>
+      <input type="radio" name="tab-compras" id="tab-proveedores" class="tabs__radio">
+      <input type="radio" name="tab-compras" id="tab-inventario" class="tabs__radio">
+      <input type="radio" name="tab-compras" id="tab-corte" class="tabs__radio">
+      <input type="radio" name="tab-compras" id="tab-incidentes" class="tabs__radio">
+
+      <div class="tabs__nav" role="tablist" aria-label="Secciones de compras e inventario">
+        <label for="tab-ordenes" class="tabs__label">Órdenes de compra</label>
+        <label for="tab-proveedores" class="tabs__label">Proveedores</label>
+        <label for="tab-inventario" class="tabs__label">Inventario y precios</label>
+        <label for="tab-corte" class="tabs__label">Corte de caja</label>
+        <label for="tab-incidentes" class="tabs__label">Incidentes de tienda</label>
+      </div>
+
+      <div class="tabs__panels">
+
+        <!-- ============ 1. ÓRDENES DE COMPRA ============ -->
+        <section class="tabs__panel" id="seccion-ordenes" aria-label="Órdenes de compra">
+          <div class="section-head">
+            <div>
+              <h2>Órdenes de compra</h2>
+              <p>Flujo: Borrador → Enviada → Recibida (o Cancelada). Al recibir, el stock y el costo se actualizan.</p>
+            </div>
+            <a href="#modal-orden-crear" class="btn btn--primary">+ Nueva orden</a>
+          </div>
+
+          <section class="toolbar" aria-label="Filtros de órdenes">
+            <input type="search" id="buscar-orden" class="toolbar__search" placeholder="Buscar por folio o proveedor…" aria-label="Buscar órdenes">
+            <select id="filtro-estatus-orden" class="toolbar__select" aria-label="Filtrar por estatus">
+              <option value="">Todos los estatus</option>
+              <option value="borrador">Borrador</option>
+              <option value="enviada">Enviada</option>
+              <option value="recibida">Recibida</option>
+              <option value="cancelada">Cancelada</option>
+            </select>
+          </section>
+
+          <div class="table-wrapper">
+            <table class="data-table" id="tabla-ordenes">
+              <caption class="sr-only">Órdenes de compra a proveedores</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Folio</th>
+                  <th scope="col">Proveedor</th>
+                  <th scope="col">Creada por</th>
+                  <th scope="col">Fecha</th>
+                  <th scope="col">Estatus</th>
+                  <th scope="col" class="num">Total</th>
+                  <th scope="col" class="data-table__actions-col">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-label="Folio"><strong>OC-0003</strong></td>
+                  <td data-label="Proveedor">Pet Supplies MX</td>
+                  <td data-label="Creada por">Laura Méndez</td>
+                  <td data-label="Fecha">16/11/2026</td>
+                  <td data-label="Estatus"><span class="badge badge--neutral">Borrador</span></td>
+                  <td data-label="Total" class="num">$7,450.00</td>
+                  <td data-label="Acciones" class="data-table__actions">
+                    <a href="#modal-orden-ver" class="btn btn--small btn--ghost">Ver</a>
+                    <a href="#modal-orden-editar" class="btn btn--small btn--secondary">Editar</a>
+                    <a href="#modal-orden-enviar" class="btn btn--small btn--success">Enviar</a>
+                    <a href="#modal-orden-cancelar" class="btn btn--small btn--danger">Cancelar</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td data-label="Folio"><strong>OC-0002</strong></td>
+                  <td data-label="Proveedor">Distribuidora Canina del Norte</td>
+                  <td data-label="Creada por">Laura Méndez</td>
+                  <td data-label="Fecha">12/11/2026</td>
+                  <td data-label="Estatus"><span class="badge badge--info">Enviada</span></td>
+                  <td data-label="Total" class="num">$12,600.00</td>
+                  <td data-label="Acciones" class="data-table__actions">
+                    <a href="#modal-orden-ver" class="btn btn--small btn--ghost">Ver</a>
+                    <a href="#modal-orden-recibir" class="btn btn--small btn--success">Recibir</a>
+                    <a href="#modal-orden-cancelar" class="btn btn--small btn--danger">Cancelar</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td data-label="Folio"><strong>OC-0001</strong></td>
+                  <td data-label="Proveedor">Pet Supplies MX</td>
+                  <td data-label="Creada por">Laura Méndez</td>
+                  <td data-label="Fecha">05/11/2026</td>
+                  <td data-label="Estatus"><span class="badge badge--success">Recibida</span></td>
+                  <td data-label="Total" class="num">$3,200.00</td>
+                  <td data-label="Acciones" class="data-table__actions">
+                    <a href="#modal-orden-ver" class="btn btn--small btn--ghost">Ver</a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ============ 2. PROVEEDORES ============ -->
+        <section class="tabs__panel" id="seccion-proveedores" aria-label="Proveedores">
+          <div class="section-head">
+            <div>
+              <h2>Proveedores</h2>
+              <p>Datos de contacto y estatus de cada proveedor.</p>
+            </div>
+            <a href="#modal-prov-crear" class="btn btn--primary">+ Nuevo proveedor</a>
+          </div>
+
+          <section class="toolbar" aria-label="Filtros de proveedores">
+            <input type="search" id="buscar-proveedor" class="toolbar__search" placeholder="Buscar por nombre, contacto o correo…" aria-label="Buscar proveedores">
+            <select id="filtro-estado-proveedor" class="toolbar__select" aria-label="Filtrar por estado">
+              <option value="">Todos los estados</option>
+              <option value="activo">Activo</option>
+              <option value="inactivo">Inactivo</option>
+            </select>
+          </section>
+
+          <div class="table-wrapper">
+            <table class="data-table" id="tabla-proveedores">
+              <caption class="sr-only">Listado de proveedores</caption>
+              <thead>
+                <tr>
+                  <th scope="col">ID</th>
+                  <th scope="col">Proveedor</th>
+                  <th scope="col">Contacto</th>
+                  <th scope="col">Teléfono</th>
+                  <th scope="col">Correo</th>
+                  <th scope="col">Estado</th>
+                  <th scope="col" class="data-table__actions-col">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-label="ID">001</td>
+                  <td data-label="Proveedor">Pet Supplies MX</td>
+                  <td data-label="Contacto">Ricardo Salas</td>
+                  <td data-label="Teléfono">55 1234 5678</td>
+                  <td data-label="Correo">ventas@petsuppliesmx.com</td>
+                  <td data-label="Estado"><span class="badge badge--active">Activo</span></td>
+                  <td data-label="Acciones" class="data-table__actions">
+                    <a href="#modal-prov-editar" class="btn btn--small btn--secondary">Editar</a>
+                    <a href="#modal-prov-desactivar" class="btn btn--small btn--danger">Desactivar</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td data-label="ID">002</td>
+                  <td data-label="Proveedor">Distribuidora Canina del Norte</td>
+                  <td data-label="Contacto">Marcela Ibarra</td>
+                  <td data-label="Teléfono">81 8765 4321</td>
+                  <td data-label="Correo">pedidos@caninadelnorte.com</td>
+                  <td data-label="Estado"><span class="badge badge--active">Activo</span></td>
+                  <td data-label="Acciones" class="data-table__actions">
+                    <a href="#modal-prov-editar" class="btn btn--small btn--secondary">Editar</a>
+                    <a href="#modal-prov-desactivar" class="btn btn--small btn--danger">Desactivar</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td data-label="ID">003</td>
+                  <td data-label="Proveedor">Accesorios Mascotas Mexicanas</td>
+                  <td data-label="Contacto">Jorge Pineda</td>
+                  <td data-label="Teléfono">33 5555 0101</td>
+                  <td data-label="Correo">contacto@accmascotas.mx</td>
+                  <td data-label="Estado"><span class="badge badge--inactive">Inactivo</span></td>
+                  <td data-label="Acciones" class="data-table__actions">
+                    <a href="#modal-prov-editar" class="btn btn--small btn--secondary">Editar</a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ============ 3. INVENTARIO Y PRECIOS ============ -->
+        <section class="tabs__panel" id="seccion-inventario" aria-label="Inventario y precios">
+          <div class="section-head">
+            <div>
+              <h2>Inventario y precios</h2>
+              <p>El stock sube con las órdenes recibidas y baja con las salidas. Los ajustes manuales se registran en la bitácora de movimientos.</p>
+            </div>
+          </div>
+
+          <section class="toolbar" aria-label="Filtros de inventario">
+            <input type="search" id="buscar-producto" class="toolbar__search" placeholder="Buscar por SKU o nombre…" aria-label="Buscar productos">
+            <select id="filtro-stock" class="toolbar__select" aria-label="Filtrar por nivel de stock">
+              <option value="">Todo el stock</option>
+              <option value="disponible">Disponible</option>
+              <option value="bajo">Stock bajo</option>
+              <option value="agotado">Agotado</option>
+            </select>
+          </section>
+
+          <div class="table-wrapper">
+            <table class="data-table" id="tabla-inventario">
+              <caption class="sr-only">Inventario con costos y precios</caption>
+              <thead>
+                <tr>
+                  <th scope="col">SKU</th>
+                  <th scope="col">Producto</th>
+                  <th scope="col" class="num">Costo unitario</th>
+                  <th scope="col" class="num">Precio público</th>
+                  <th scope="col" class="num">Stock</th>
+                  <th scope="col" class="num">Mínimo</th>
+                  <th scope="col">Nivel</th>
+                  <th scope="col" class="data-table__actions-col">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-label="SKU"><strong>SKU-PER-001</strong></td>
+                  <td data-label="Producto">Croquetas Premium Adulto 20kg</td>
+                  <td data-label="Costo unitario" class="num">$650.00</td>
+                  <td data-label="Precio público" class="num">$899.00</td>
+                  <td data-label="Stock" class="num"><strong>15</strong></td>
+                  <td data-label="Mínimo" class="num">5</td>
+                  <td data-label="Nivel"><span class="badge badge--success">Disponible</span></td>
+                  <td data-label="Acciones" class="data-table__actions">
+                    <a href="#modal-prod-precios" class="btn btn--small btn--secondary">Precios</a>
+                    <a href="#modal-prod-ajuste" class="btn btn--small btn--ghost">Ajustar stock</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td data-label="SKU"><strong>SKU-GAT-002</strong></td>
+                  <td data-label="Producto">Arena Sanitaria Aglutinante 10kg</td>
+                  <td data-label="Costo unitario" class="num">$170.00</td>
+                  <td data-label="Precio público" class="num">$250.00</td>
+                  <td data-label="Stock" class="num"><strong>4</strong></td>
+                  <td data-label="Mínimo" class="num">5</td>
+                  <td data-label="Nivel"><span class="badge badge--warning">Stock bajo</span></td>
+                  <td data-label="Acciones" class="data-table__actions">
+                    <a href="#modal-prod-precios" class="btn btn--small btn--secondary">Precios</a>
+                    <a href="#modal-prod-ajuste" class="btn btn--small btn--ghost">Ajustar stock</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td data-label="SKU"><strong>SKU-PER-003</strong></td>
+                  <td data-label="Producto">Collar Ajustable Talla M</td>
+                  <td data-label="Costo unitario" class="num">$45.00</td>
+                  <td data-label="Precio público" class="num">$99.00</td>
+                  <td data-label="Stock" class="num"><strong>0</strong></td>
+                  <td data-label="Mínimo" class="num">10</td>
+                  <td data-label="Nivel"><span class="badge badge--danger">Agotado</span></td>
+                  <td data-label="Acciones" class="data-table__actions">
+                    <a href="#modal-prod-precios" class="btn btn--small btn--secondary">Precios</a>
+                    <a href="#modal-prod-ajuste" class="btn btn--small btn--ghost">Ajustar stock</a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ============ 4. CORTE DE CAJA ============ -->
+        <section class="tabs__panel" id="seccion-corte" aria-label="Corte de caja diario">
+          <div class="section-head">
+            <div>
+              <h2>Corte de caja diario</h2>
+              <p>Resumen de los movimientos del día con el precio público. No incluye cobros ni cambio.</p>
+            </div>
+          </div>
+
+          <form class="date-picker" id="form-corte" action="#" method="get">
+            <div class="form__group">
+              <label for="corte-fecha">Fecha del corte</label>
+              <input type="date" id="corte-fecha" name="fecha" required>
+            </div>
+            <button type="submit" class="btn btn--primary">Ver corte</button>
+          </form>
+
+          <section class="summary" aria-label="Totales del corte">
+            <article class="summary__card summary__card--success">
+              <p class="summary__label">Total vendido</p>
+              <p class="summary__value" id="corte-total">$2,448.00</p>
+              <p class="summary__hint">7 piezas</p>
+            </article>
+            <article class="summary__card summary__card--danger">
+              <p class="summary__label">Mermas</p>
+              <p class="summary__value" id="corte-mermas">1</p>
+              <p class="summary__hint">Piezas dadas de baja</p>
+            </article>
+            <article class="summary__card">
+              <p class="summary__label">Uso interno</p>
+              <p class="summary__value" id="corte-interno">2</p>
+              <p class="summary__hint">Piezas de uso en tienda</p>
+            </article>
+            <article class="summary__card summary__card--warning">
+              <p class="summary__label">Estatus del corte</p>
+              <p class="summary__value" style="font-size:1.2rem;"><span class="badge badge--warning" id="corte-estatus">Pendiente de revisión</span></p>
+              <p class="summary__hint">Fecha: 16/11/2026</p>
+            </article>
+          </section>
+
+          <div class="table-wrapper">
+            <table class="data-table" id="tabla-corte">
+              <caption class="sr-only">Detalle del corte por producto</caption>
+              <thead>
+                <tr>
+                  <th scope="col">SKU</th>
+                  <th scope="col">Producto</th>
+                  <th scope="col" class="num">Vendidas</th>
+                  <th scope="col" class="num">Mermas</th>
+                  <th scope="col" class="num">Uso interno</th>
+                  <th scope="col" class="num">Importe vendido</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-label="SKU"><strong>SKU-PER-001</strong></td>
+                  <td data-label="Producto">Croquetas Premium Adulto 20kg</td>
+                  <td data-label="Vendidas" class="num">2</td>
+                  <td data-label="Mermas" class="num">0</td>
+                  <td data-label="Uso interno" class="num">0</td>
+                  <td data-label="Importe vendido" class="num">$1,798.00</td>
+                </tr>
+                <tr>
+                  <td data-label="SKU"><strong>SKU-GAT-002</strong></td>
+                  <td data-label="Producto">Arena Sanitaria Aglutinante 10kg</td>
+                  <td data-label="Vendidas" class="num">2</td>
+                  <td data-label="Mermas" class="num">1</td>
+                  <td data-label="Uso interno" class="num">0</td>
+                  <td data-label="Importe vendido" class="num">$500.00</td>
+                </tr>
+                <tr>
+                  <td data-label="SKU"><strong>SKU-PER-003</strong></td>
+                  <td data-label="Producto">Collar Ajustable Talla M</td>
+                  <td data-label="Vendidas" class="num">3</td>
+                  <td data-label="Mermas" class="num">0</td>
+                  <td data-label="Uso interno" class="num">2</td>
+                  <td data-label="Importe vendido" class="num">$297.00</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="form__actions">
+            <a href="#modal-corte-revisar" class="btn btn--primary">Marcar como revisado</a>
+          </div>
+
+          <h3 class="subsection-title" style="margin-top:28px;">Cortes anteriores</h3>
+          <div class="table-wrapper">
+            <table class="data-table" id="tabla-cortes-previos">
+              <caption class="sr-only">Historial de cortes de caja</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Fecha</th>
+                  <th scope="col" class="num">Total vendido</th>
+                  <th scope="col">Estatus</th>
+                  <th scope="col">Revisado por</th>
+                  <th scope="col" class="data-table__actions-col">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-label="Fecha">15/11/2026</td>
+                  <td data-label="Total vendido" class="num">$3,150.00</td>
+                  <td data-label="Estatus"><span class="badge badge--success">Revisado</span></td>
+                  <td data-label="Revisado por">Laura Méndez</td>
+                  <td data-label="Acciones" class="data-table__actions">
+                    <a href="#seccion-corte" class="btn btn--small btn--ghost">Ver</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td data-label="Fecha">14/11/2026</td>
+                  <td data-label="Total vendido" class="num">$1,980.00</td>
+                  <td data-label="Estatus"><span class="badge badge--success">Revisado</span></td>
+                  <td data-label="Revisado por">Laura Méndez</td>
+                  <td data-label="Acciones" class="data-table__actions">
+                    <a href="#seccion-corte" class="btn btn--small btn--ghost">Ver</a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ============ 5. INCIDENTES DE TIENDA ============ -->
+        <section class="tabs__panel" id="seccion-incidentes" aria-label="Incidentes de tienda">
+          <div class="section-head">
+            <div>
+              <h2>Incidentes de tienda</h2>
+              <p>Reportes enviados por los empleados sobre stock o situaciones en la tienda.</p>
+            </div>
+          </div>
+
+          <section class="toolbar" aria-label="Filtros de incidentes">
+            <input type="search" id="buscar-incidente" class="toolbar__search" placeholder="Buscar por empleado, tipo o producto…" aria-label="Buscar incidentes">
+            <select id="filtro-gravedad" class="toolbar__select" aria-label="Filtrar por gravedad">
+              <option value="">Toda la gravedad</option>
+              <option value="baja">Baja</option>
+              <option value="media">Media</option>
+              <option value="alta">Alta</option>
+            </select>
+            <select id="filtro-estatus-incidente" class="toolbar__select" aria-label="Filtrar por estatus">
+              <option value="">Todos los estatus</option>
+              <option value="enviado">Enviado</option>
+              <option value="revisado">Revisado</option>
+            </select>
+          </section>
+
+          <div class="table-wrapper">
+            <table class="data-table" id="tabla-incidentes">
+              <caption class="sr-only">Incidentes reportados por empleados</caption>
+              <thead>
+                <tr>
+                  <th scope="col">ID</th>
+                  <th scope="col">Fecha</th>
+                  <th scope="col">Empleado</th>
+                  <th scope="col">Tipo</th>
+                  <th scope="col">Producto</th>
+                  <th scope="col">Gravedad</th>
+                  <th scope="col">Estatus</th>
+                  <th scope="col" class="data-table__actions-col">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-label="ID">012</td>
+                  <td data-label="Fecha">16/11/2026 09:30</td>
+                  <td data-label="Empleado">Carlos Ramírez</td>
+                  <td data-label="Tipo">Producto dañado</td>
+                  <td data-label="Producto">Arena Sanitaria Aglutinante 10kg</td>
+                  <td data-label="Gravedad"><span class="badge badge--warning">Media</span></td>
+                  <td data-label="Estatus"><span class="badge badge--warning">Enviado</span></td>
+                  <td data-label="Acciones" class="data-table__actions">
+                    <a href="#modal-inc-ver" class="btn btn--small btn--ghost">Ver</a>
+                    <a href="#modal-inc-revisar" class="btn btn--small btn--success">Marcar revisado</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td data-label="ID">009</td>
+                  <td data-label="Fecha">14/11/2026 18:10</td>
+                  <td data-label="Empleado">Carlos Ramírez</td>
+                  <td data-label="Tipo">Diferencia de stock</td>
+                  <td data-label="Producto">Croquetas Premium Adulto 20kg</td>
+                  <td data-label="Gravedad"><span class="badge badge--danger">Alta</span></td>
+                  <td data-label="Estatus"><span class="badge badge--success">Revisado</span></td>
+                  <td data-label="Acciones" class="data-table__actions">
+                    <a href="#modal-inc-ver" class="btn btn--small btn--ghost">Ver</a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+      </div><!-- /.tabs__panels -->
+    </div><!-- /.tabs -->
+
+    <footer class="mgr-panel__footer">
+      <span>Datos de prueba · Compras e inventario</span>
+      <nav class="pagination" aria-label="Paginación">
+        <a href="#" class="pagination__link pagination__link--disabled">‹ Anterior</a>
+        <a href="#" class="pagination__link pagination__link--current">1</a>
+        <a href="#" class="pagination__link pagination__link--disabled">Siguiente ›</a>
+      </nav>
+    </footer>
+  </main>
+
+  <!-- ===================== MODALES (OCULTOS) =====================
+       Se muestran con :target (sin JavaScript). Para cerrarlos,
+       el enlace apunta a "#mgr-panel". -->
+
+  <!-- ---------- ÓRDENES DE COMPRA ---------- -->
+
+  <!-- MODAL: Nueva orden de compra -->
+  <div class="modal modal--wide" id="modal-orden-crear" role="dialog" aria-modal="true" aria-labelledby="titulo-orden-crear">
+    <a href="#mgr-panel" class="modal__overlay" aria-label="Cerrar"></a>
+    <div class="modal__content">
+      <header class="modal__header">
+        <h2 id="titulo-orden-crear">Nueva orden de compra</h2>
+        <a href="#mgr-panel" class="modal__close" aria-label="Cerrar">×</a>
+      </header>
+      <form class="form" id="form-orden-crear" action="#" method="post">
+        <div class="form__grid">
+          <div class="form__group">
+            <label for="orden-proveedor">Proveedor</label>
+            <select id="orden-proveedor" name="id_proveedor" required>
+              <option value="">Seleccionar…</option>
+              <option value="1">Pet Supplies MX</option>
+              <option value="2">Distribuidora Canina del Norte</option>
+            </select>
+          </div>
+          <div class="form__group">
+            <label for="orden-fecha-esperada">Fecha esperada de entrega</label>
+            <input type="date" id="orden-fecha-esperada" name="fecha_esperada">
+          </div>
+        </div>
+
+        <!-- Productos de la orden -->
+        <div class="line-items" id="orden-lineas">
+          <div class="line-items__head">
+            <span>Producto</span><span>Cantidad</span><span>Costo unit.</span><span>Subtotal</span><span></span>
+          </div>
+
+          <div class="line-items__row">
+            <select name="producto[]" aria-label="Producto" required>
+              <option value="">Seleccionar…</option>
+              <option value="1">SKU-PER-001 · Croquetas Premium Adulto 20kg</option>
+              <option value="2">SKU-GAT-002 · Arena Sanitaria Aglutinante 10kg</option>
+              <option value="3">SKU-PER-003 · Collar Ajustable Talla M</option>
+            </select>
+            <input type="number" name="cantidad[]" min="1" step="1" aria-label="Cantidad" required>
+            <input type="number" name="costo[]" min="0" step="0.01" aria-label="Costo unitario" required>
+            <output name="subtotal[]">$0.00</output>
+            <button type="button" class="line-items__remove" aria-label="Quitar producto">×</button>
+          </div>
+
+          <div class="line-items__row">
+            <select name="producto[]" aria-label="Producto">
+              <option value="">Seleccionar…</option>
+              <option value="1">SKU-PER-001 · Croquetas Premium Adulto 20kg</option>
+              <option value="2">SKU-GAT-002 · Arena Sanitaria Aglutinante 10kg</option>
+              <option value="3">SKU-PER-003 · Collar Ajustable Talla M</option>
+            </select>
+            <input type="number" name="cantidad[]" min="1" step="1" aria-label="Cantidad">
+            <input type="number" name="costo[]" min="0" step="0.01" aria-label="Costo unitario">
+            <output name="subtotal[]">$0.00</output>
+            <button type="button" class="line-items__remove" aria-label="Quitar producto">×</button>
+          </div>
+
+          <div>
+            <button type="button" class="btn btn--small btn--ghost" id="btn-agregar-linea">+ Agregar producto</button>
+          </div>
+
+          <div class="line-items__total">
+            <span>Total:</span><output id="orden-total" name="total">$0.00</output>
+          </div>
+        </div>
+
+        <footer class="modal__footer">
+          <a href="#mgr-panel" class="btn btn--ghost">Cancelar</a>
+          <button type="submit" class="btn btn--primary">Guardar como borrador</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Editar orden (solo en estatus Borrador) -->
+  <div class="modal modal--wide" id="modal-orden-editar" role="dialog" aria-modal="true" aria-labelledby="titulo-orden-editar">
+    <a href="#mgr-panel" class="modal__overlay" aria-label="Cerrar"></a>
+    <div class="modal__content">
+      <header class="modal__header">
+        <h2 id="titulo-orden-editar">Editar orden de compra <span class="badge badge--neutral">Borrador</span></h2>
+        <a href="#mgr-panel" class="modal__close" aria-label="Cerrar">×</a>
+      </header>
+      <form class="form" id="form-orden-editar" action="#" method="post">
+        <input type="hidden" id="editar-orden-id" name="id_orden">
+        <div class="form__grid">
+          <div class="form__group">
+            <label for="editar-orden-proveedor">Proveedor</label>
+            <select id="editar-orden-proveedor" name="id_proveedor" required>
+              <option value="1">Pet Supplies MX</option>
+              <option value="2">Distribuidora Canina del Norte</option>
+            </select>
+          </div>
+          <div class="form__group">
+            <label for="editar-orden-fecha">Fecha esperada de entrega</label>
+            <input type="date" id="editar-orden-fecha" name="fecha_esperada">
+          </div>
+        </div>
+
+        <div class="line-items" id="editar-orden-lineas">
+          <div class="line-items__head">
+            <span>Producto</span><span>Cantidad</span><span>Costo unit.</span><span>Subtotal</span><span></span>
+          </div>
+
+          <div class="line-items__row">
+            <select name="producto[]" aria-label="Producto" required>
+              <option value="1">SKU-PER-001 · Croquetas Premium Adulto 20kg</option>
+              <option value="2">SKU-GAT-002 · Arena Sanitaria Aglutinante 10kg</option>
+              <option value="3" selected>SKU-PER-003 · Collar Ajustable Talla M</option>
+            </select>
+            <input type="number" name="cantidad[]" min="1" step="1" value="50" aria-label="Cantidad" required>
+            <input type="number" name="costo[]" min="0" step="0.01" value="45.00" aria-label="Costo unitario" required>
+            <output name="subtotal[]">$2,250.00</output>
+            <button type="button" class="line-items__remove" aria-label="Quitar producto">×</button>
+          </div>
+
+          <div>
+            <button type="button" class="btn btn--small btn--ghost" id="btn-agregar-linea-editar">+ Agregar producto</button>
+          </div>
+
+          <div class="line-items__total">
+            <span>Total:</span><output id="editar-orden-total" name="total">$2,250.00</output>
+          </div>
+        </div>
+
+        <footer class="modal__footer">
+          <a href="#mgr-panel" class="btn btn--ghost">Cancelar</a>
+          <button type="submit" class="btn btn--primary">Guardar cambios</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Ver orden -->
+  <div class="modal modal--wide" id="modal-orden-ver" role="dialog" aria-modal="true" aria-labelledby="titulo-orden-ver">
+    <a href="#mgr-panel" class="modal__overlay" aria-label="Cerrar"></a>
+    <div class="modal__content">
+      <header class="modal__header">
+        <h2 id="titulo-orden-ver">Detalle de la orden</h2>
+        <a href="#mgr-panel" class="modal__close" aria-label="Cerrar">×</a>
+      </header>
+      <dl class="detail">
+        <div><dt>Folio</dt><dd id="ver-orden-folio">—</dd></div>
+        <div><dt>Proveedor</dt><dd id="ver-orden-proveedor">—</dd></div>
+        <div><dt>Creada por</dt><dd id="ver-orden-creador">—</dd></div>
+        <div><dt>Fecha de creación</dt><dd id="ver-orden-fecha">—</dd></div>
+        <div><dt>Fecha de recepción</dt><dd id="ver-orden-recepcion">—</dd></div>
+        <div><dt>Estatus</dt><dd id="ver-orden-estatus">—</dd></div>
+      </dl>
+      <table class="mini-table" id="ver-orden-detalle">
+        <caption class="sr-only">Productos de la orden</caption>
+        <thead>
+          <tr><th>Producto</th><th class="num">Cantidad</th><th class="num">Costo unit.</th><th class="num">Subtotal</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td></tr>
+        </tbody>
+        <tfoot>
+          <tr><td colspan="3" class="num">Total</td><td class="num" id="ver-orden-total">—</td></tr>
+        </tfoot>
+      </table>
+      <footer class="modal__footer">
+        <a href="#mgr-panel" class="btn btn--primary">Cerrar</a>
+      </footer>
+    </div>
+  </div>
+
+  <!-- MODAL: Enviar orden -->
+  <div class="modal modal--small" id="modal-orden-enviar" role="dialog" aria-modal="true" aria-labelledby="titulo-orden-enviar">
+    <a href="#mgr-panel" class="modal__overlay" aria-label="Cerrar"></a>
+    <div class="modal__content">
+      <header class="modal__header">
+        <h2 id="titulo-orden-enviar">Enviar orden</h2>
+        <a href="#mgr-panel" class="modal__close" aria-label="Cerrar">×</a>
+      </header>
+      <p class="modal__text">
+        La orden <strong id="enviar-orden-folio">seleccionada</strong> pasará a <strong>Enviada</strong>
+        y ya no podrá editarse.
+      </p>
+      <form id="form-orden-enviar" action="#" method="post">
+        <input type="hidden" id="enviar-orden-id" name="id_orden">
+        <footer class="modal__footer">
+          <a href="#mgr-panel" class="btn btn--ghost">Cancelar</a>
+          <button type="submit" class="btn btn--primary">Sí, enviar</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Recibir orden -->
+  <div class="modal modal--small" id="modal-orden-recibir" role="dialog" aria-modal="true" aria-labelledby="titulo-orden-recibir">
+    <a href="#mgr-panel" class="modal__overlay" aria-label="Cerrar"></a>
+    <div class="modal__content">
+      <header class="modal__header">
+        <h2 id="titulo-orden-recibir">Recibir orden</h2>
+        <a href="#mgr-panel" class="modal__close" aria-label="Cerrar">×</a>
+      </header>
+      <p class="modal__text">
+        Al marcar <strong id="recibir-orden-folio">la orden</strong> como <strong>Recibida</strong> se sumará el stock,
+        se actualizará el costo de cada producto y se registrará el movimiento. Esta acción no se puede deshacer.
+      </p>
+      <form id="form-orden-recibir" action="#" method="post">
+        <input type="hidden" id="recibir-orden-id" name="id_orden">
+        <footer class="modal__footer">
+          <a href="#mgr-panel" class="btn btn--ghost">Cancelar</a>
+          <button type="submit" class="btn btn--success-solid">Sí, recibir</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Cancelar orden -->
+  <div class="modal modal--small" id="modal-orden-cancelar" role="alertdialog" aria-modal="true" aria-labelledby="titulo-orden-cancelar">
+    <a href="#mgr-panel" class="modal__overlay" aria-label="Cerrar"></a>
+    <div class="modal__content">
+      <header class="modal__header">
+        <h2 id="titulo-orden-cancelar">Cancelar orden</h2>
+        <a href="#mgr-panel" class="modal__close" aria-label="Cerrar">×</a>
+      </header>
+      <p class="modal__text">
+        ¿Seguro que deseas cancelar <strong id="cancelar-orden-folio">esta orden</strong>?
+        Esta acción no se puede deshacer.
+      </p>
+      <form id="form-orden-cancelar" action="#" method="post">
+        <input type="hidden" id="cancelar-orden-id" name="id_orden">
+        <footer class="modal__footer">
+          <a href="#mgr-panel" class="btn btn--ghost">Volver</a>
+          <button type="submit" class="btn btn--danger-solid">Sí, cancelar</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <!-- ---------- PROVEEDORES ---------- -->
+
+  <!-- MODAL: Nuevo proveedor -->
+  <div class="modal" id="modal-prov-crear" role="dialog" aria-modal="true" aria-labelledby="titulo-prov-crear">
+    <a href="#mgr-panel" class="modal__overlay" aria-label="Cerrar"></a>
+    <div class="modal__content">
+      <header class="modal__header">
+        <h2 id="titulo-prov-crear">Nuevo proveedor</h2>
+        <a href="#mgr-panel" class="modal__close" aria-label="Cerrar">×</a>
+      </header>
+      <form class="form" id="form-prov-crear" action="#" method="post">
+        <div class="form__grid">
+          <div class="form__group form__group--full">
+            <label for="prov-nombre">Nombre del proveedor</label>
+            <input type="text" id="prov-nombre" name="nombre" required>
+          </div>
+          <div class="form__group">
+            <label for="prov-contacto">Persona de contacto</label>
+            <input type="text" id="prov-contacto" name="contacto" required>
+          </div>
+          <div class="form__group">
+            <label for="prov-telefono">Teléfono</label>
+            <input type="tel" id="prov-telefono" name="telefono" required>
+          </div>
+          <div class="form__group">
+            <label for="prov-correo">Correo electrónico</label>
+            <input type="email" id="prov-correo" name="correo">
+          </div>
+          <div class="form__group">
+            <label for="prov-estado">Estado</label>
+            <select id="prov-estado" name="estado">
+              <option value="activo">Activo</option>
+              <option value="inactivo">Inactivo</option>
+            </select>
+          </div>
+          <div class="form__group form__group--full">
+            <label for="prov-direccion">Dirección</label>
+            <input type="text" id="prov-direccion" name="direccion">
+          </div>
+        </div>
+        <footer class="modal__footer">
+          <a href="#mgr-panel" class="btn btn--ghost">Cancelar</a>
+          <button type="submit" class="btn btn--primary">Guardar</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Editar proveedor -->
+  <div class="modal" id="modal-prov-editar" role="dialog" aria-modal="true" aria-labelledby="titulo-prov-editar">
+    <a href="#mgr-panel" class="modal__overlay" aria-label="Cerrar"></a>
+    <div class="modal__content">
+      <header class="modal__header">
+        <h2 id="titulo-prov-editar">Editar proveedor</h2>
+        <a href="#mgr-panel" class="modal__close" aria-label="Cerrar">×</a>
+      </header>
+      <form class="form" id="form-prov-editar" action="#" method="post">
+        <input type="hidden" id="editar-prov-id" name="id_proveedor">
+        <div class="form__grid">
+          <div class="form__group form__group--full">
+            <label for="editar-prov-nombre">Nombre del proveedor</label>
+            <input type="text" id="editar-prov-nombre" name="nombre" required>
+          </div>
+          <div class="form__group">
+            <label for="editar-prov-contacto">Persona de contacto</label>
+            <input type="text" id="editar-prov-contacto" name="contacto" required>
+          </div>
+          <div class="form__group">
+            <label for="editar-prov-telefono">Teléfono</label>
+            <input type="tel" id="editar-prov-telefono" name="telefono" required>
+          </div>
+          <div class="form__group">
+            <label for="editar-prov-correo">Correo electrónico</label>
+            <input type="email" id="editar-prov-correo" name="correo">
+          </div>
+          <div class="form__group">
+            <label for="editar-prov-estado">Estado</label>
+            <select id="editar-prov-estado" name="estado">
+              <option value="activo">Activo</option>
+              <option value="inactivo">Inactivo</option>
+            </select>
+          </div>
+          <div class="form__group form__group--full">
+            <label for="editar-prov-direccion">Dirección</label>
+            <input type="text" id="editar-prov-direccion" name="direccion">
+          </div>
+        </div>
+        <footer class="modal__footer">
+          <a href="#mgr-panel" class="btn btn--ghost">Cancelar</a>
+          <button type="submit" class="btn btn--primary">Guardar cambios</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Desactivar proveedor (conserva el historial de órdenes) -->
+  <div class="modal modal--small" id="modal-prov-desactivar" role="alertdialog" aria-modal="true" aria-labelledby="titulo-prov-desactivar">
+    <a href="#mgr-panel" class="modal__overlay" aria-label="Cerrar"></a>
+    <div class="modal__content">
+      <header class="modal__header">
+        <h2 id="titulo-prov-desactivar">Desactivar proveedor</h2>
+        <a href="#mgr-panel" class="modal__close" aria-label="Cerrar">×</a>
+      </header>
+      <p class="modal__text">
+        ¿Seguro que deseas desactivar a <strong id="desactivar-prov-nombre">este proveedor</strong>?
+        No se podrán crear órdenes nuevas con él, pero se conserva el historial de sus órdenes.
+      </p>
+      <form id="form-prov-desactivar" action="#" method="post">
+        <input type="hidden" id="desactivar-prov-id" name="id_proveedor">
+        <footer class="modal__footer">
+          <a href="#mgr-panel" class="btn btn--ghost">Cancelar</a>
+          <button type="submit" class="btn btn--danger-solid">Sí, desactivar</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <!-- ---------- INVENTARIO Y PRECIOS ---------- -->
+
+  <!-- MODAL: Editar costo, precio y stock mínimo -->
+  <div class="modal modal--small" id="modal-prod-precios" role="dialog" aria-modal="true" aria-labelledby="titulo-prod-precios">
+    <a href="#mgr-panel" class="modal__overlay" aria-label="Cerrar"></a>
+    <div class="modal__content">
+      <header class="modal__header">
+        <h2 id="titulo-prod-precios">Precios del producto</h2>
+        <a href="#mgr-panel" class="modal__close" aria-label="Cerrar">×</a>
+      </header>
+      <form class="form" id="form-prod-precios" action="#" method="post">
+        <input type="hidden" id="precios-id" name="id_producto">
+        <p class="modal__text"><strong id="precios-nombre">Producto</strong></p>
+        <div class="form__grid">
+          <div class="form__group">
+            <label for="precios-costo">Costo unitario</label>
+            <input type="number" id="precios-costo" name="costo_unitario" min="0" step="0.01" required>
+          </div>
+          <div class="form__group">
+            <label for="precios-precio">Precio público</label>
+            <input type="number" id="precios-precio" name="precio_publico" min="0" step="0.01" required>
+          </div>
+          <div class="form__group form__group--full">
+            <label for="precios-minimo">Stock mínimo</label>
+            <input type="number" id="precios-minimo" name="stock_minimo" min="0" step="1" required>
+            <p class="form__hint">Con este nivel o menos, el producto aparece como «Stock bajo».</p>
+          </div>
+        </div>
+        <footer class="modal__footer">
+          <a href="#mgr-panel" class="btn btn--ghost">Cancelar</a>
+          <button type="submit" class="btn btn--primary">Guardar</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Ajustar stock (queda en la bitácora de movimientos) -->
+  <div class="modal modal--small" id="modal-prod-ajuste" role="dialog" aria-modal="true" aria-labelledby="titulo-prod-ajuste">
+    <a href="#mgr-panel" class="modal__overlay" aria-label="Cerrar"></a>
+    <div class="modal__content">
+      <header class="modal__header">
+        <h2 id="titulo-prod-ajuste">Ajustar stock</h2>
+        <a href="#mgr-panel" class="modal__close" aria-label="Cerrar">×</a>
+      </header>
+      <form class="form" id="form-prod-ajuste" action="#" method="post">
+        <input type="hidden" id="ajuste-id" name="id_producto">
+        <p class="modal__text"><strong id="ajuste-nombre">Producto</strong> · Stock actual: <strong id="ajuste-actual">—</strong></p>
+        <div class="form__grid">
+          <div class="form__group form__group--full">
+            <label for="ajuste-nuevo">Nuevo stock (conteo físico)</label>
+            <input type="number" id="ajuste-nuevo" name="stock_nuevo" min="0" step="1" required>
+          </div>
+          <div class="form__group form__group--full">
+            <label for="ajuste-motivo">Motivo del ajuste</label>
+            <textarea id="ajuste-motivo" name="motivo" rows="3" required placeholder="Ej. Conteo físico mensual"></textarea>
+          </div>
+        </div>
+        <p class="notice notice--warning" style="margin-top:14px;">
+          El ajuste se registra como movimiento con tu usuario y la fecha.
+        </p>
+        <footer class="modal__footer">
+          <a href="#mgr-panel" class="btn btn--ghost">Cancelar</a>
+          <button type="submit" class="btn btn--primary">Aplicar ajuste</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <!-- ---------- CORTE DE CAJA ---------- -->
+
+  <!-- MODAL: Marcar corte como revisado -->
+  <div class="modal modal--small" id="modal-corte-revisar" role="dialog" aria-modal="true" aria-labelledby="titulo-corte-revisar">
+    <a href="#mgr-panel" class="modal__overlay" aria-label="Cerrar"></a>
+    <div class="modal__content">
+      <header class="modal__header">
+        <h2 id="titulo-corte-revisar">Revisar corte de caja</h2>
+        <a href="#mgr-panel" class="modal__close" aria-label="Cerrar">×</a>
+      </header>
+      <p class="modal__text">
+        Confirmas que revisaste el corte del <strong id="revisar-corte-fecha">16/11/2026</strong>
+        con un total vendido de <strong id="revisar-corte-total">$2,448.00</strong>.
+      </p>
+      <form id="form-corte-revisar" action="#" method="post">
+        <input type="hidden" id="revisar-corte-id" name="id_corte">
+        <footer class="modal__footer">
+          <a href="#mgr-panel" class="btn btn--ghost">Cancelar</a>
+          <button type="submit" class="btn btn--success-solid">Marcar como revisado</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <!-- ---------- INCIDENTES DE TIENDA ---------- -->
+
+  <!-- MODAL: Ver incidente -->
+  <div class="modal" id="modal-inc-ver" role="dialog" aria-modal="true" aria-labelledby="titulo-inc-ver">
+    <a href="#mgr-panel" class="modal__overlay" aria-label="Cerrar"></a>
+    <div class="modal__content">
+      <header class="modal__header">
+        <h2 id="titulo-inc-ver">Detalle del incidente</h2>
+        <a href="#mgr-panel" class="modal__close" aria-label="Cerrar">×</a>
+      </header>
+      <dl class="detail">
+        <div><dt>ID</dt><dd id="ver-inc-id">—</dd></div>
+        <div><dt>Fecha del suceso</dt><dd id="ver-inc-fecha">—</dd></div>
+        <div><dt>Reportado por</dt><dd id="ver-inc-empleado">—</dd></div>
+        <div><dt>Tipo</dt><dd id="ver-inc-tipo">—</dd></div>
+        <div><dt>Producto</dt><dd id="ver-inc-producto">—</dd></div>
+        <div><dt>Cantidad afectada</dt><dd id="ver-inc-cantidad">—</dd></div>
+        <div><dt>Gravedad</dt><dd id="ver-inc-gravedad">—</dd></div>
+        <div><dt>Descripción</dt><dd id="ver-inc-descripcion">—</dd></div>
+        <div><dt>Estatus</dt><dd id="ver-inc-estatus">—</dd></div>
+      </dl>
+      <footer class="modal__footer">
+        <a href="#mgr-panel" class="btn btn--primary">Cerrar</a>
+      </footer>
+    </div>
+  </div>
+
+  <!-- MODAL: Marcar incidente como revisado -->
+  <div class="modal modal--small" id="modal-inc-revisar" role="dialog" aria-modal="true" aria-labelledby="titulo-inc-revisar">
+    <a href="#mgr-panel" class="modal__overlay" aria-label="Cerrar"></a>
+    <div class="modal__content">
+      <header class="modal__header">
+        <h2 id="titulo-inc-revisar">Marcar como revisado</h2>
+        <a href="#mgr-panel" class="modal__close" aria-label="Cerrar">×</a>
+      </header>
+      <p class="modal__text">
+        ¿Confirmas que revisaste el incidente <strong id="revisar-inc-id">seleccionado</strong>?
+      </p>
+      <form id="form-inc-revisar" action="#" method="post">
+        <input type="hidden" id="revisar-inc-hidden" name="id_incidente">
+        <footer class="modal__footer">
+          <a href="#mgr-panel" class="btn btn--ghost">Cancelar</a>
+          <button type="submit" class="btn btn--success-solid">Marcar revisado</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+</body>
+</html>

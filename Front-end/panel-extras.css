@@ -1,0 +1,355 @@
+/* =====================================================
+   WooWGuau – Estilos complementarios para los paneles nuevos
+   Se carga DESPUÉS del CSS base de cada rol:
+     · Administrador → admin-panel.css
+     · Gerente       → gerente-panel.css
+     · Empleado      → inventario-empleado.css
+   Aporta: navegación entre paneles, tarjetas de resumen,
+   pestañas (solo CSS), avisos, badges de estatus extra,
+   textarea, filas de productos y modal ancho.
+   ===================================================== */
+
+:root {
+  --color-warning-bg: #fef3c7;
+  --color-warning-text: #92400e;
+  --color-danger-bg: #fee2e2;
+  --color-danger-text: #991b1b;
+  --color-info-bg: #dbeafe;
+  --color-info-text: #1e40af;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ---------- Navegación entre paneles del rol ---------- */
+.panel-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.panel-nav__link {
+  padding: 6px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  color: var(--color-muted);
+  font-size: .85rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background .15s, color .15s;
+}
+
+.panel-nav__link:hover { background: var(--color-bg); color: var(--color-text); }
+
+.panel-nav__link--current {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+  pointer-events: none;
+}
+
+.panel-nav__spacer { flex: 1; }
+
+/* ---------- Indicador de actualización automática ---------- */
+.live-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-muted);
+  font-size: .8rem;
+}
+
+.live-indicator::before {
+  content: "";
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #16a34a;
+  animation: live-pulse 2s ease-in-out infinite;
+}
+
+.live-indicator--error::before { background: var(--color-danger); animation: none; }
+
+@keyframes live-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .35; }
+}
+
+/* ---------- Botones adicionales ---------- */
+.btn--success { background: var(--color-success-bg); color: var(--color-success-text); }
+.btn--success:hover { background: #bbf7d0; }
+
+.btn--success-solid { background: #16a34a; color: #fff; }
+.btn--success-solid:hover { background: #15803d; }
+
+/* ---------- Badges adicionales ---------- */
+.badge--success { background: var(--color-success-bg); color: var(--color-success-text); }
+.badge--warning { background: var(--color-warning-bg); color: var(--color-warning-text); }
+.badge--danger  { background: var(--color-danger-bg);  color: var(--color-danger-text); }
+.badge--info    { background: var(--color-info-bg);    color: var(--color-info-text); }
+.badge--neutral { background: var(--color-neutral-bg, #e5e7eb); color: var(--color-neutral-text, #374151); }
+
+/* ---------- Tarjetas de resumen ---------- */
+.summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.summary__card {
+  padding: 14px 16px;
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--color-primary);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.summary__card--warning { border-left-color: #f59e0b; }
+.summary__card--danger  { border-left-color: var(--color-danger); }
+.summary__card--success { border-left-color: #16a34a; }
+
+.summary__label {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: .75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.summary__value { margin: 4px 0 0; font-size: 1.6rem; font-weight: 700; }
+.summary__hint { margin: 2px 0 0; color: var(--color-muted); font-size: .8rem; }
+
+/* ---------- Avisos ---------- */
+.notice {
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  background: #eff6ff;
+  color: var(--color-info-text);
+  font-size: .88rem;
+}
+
+.notice--warning { border-color: #fde68a; background: #fffbeb; color: var(--color-warning-text); }
+
+/* ---------- Pestañas (solo CSS, con radios ocultos) ----------
+   Estructura: .tabs > input.tabs__radio × n  +  .tabs__nav > label.tabs__label × n
+               +  .tabs__panels > section.tabs__panel × n
+   El orden de radios, etiquetas y paneles debe coincidir. Hasta 5 pestañas. */
+.tabs__radio {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.tabs__nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 18px;
+  border-bottom: 2px solid var(--color-border);
+}
+
+.tabs__label {
+  margin-bottom: -2px;
+  padding: 10px 16px;
+  border-bottom: 2px solid transparent;
+  color: var(--color-muted);
+  font-weight: 600;
+  cursor: pointer;
+  transition: color .15s, border-color .15s;
+}
+
+.tabs__label:hover { color: var(--color-text); }
+
+.tabs__panel { display: none; }
+
+.tabs__radio:nth-of-type(1):checked ~ .tabs__nav .tabs__label:nth-of-type(1),
+.tabs__radio:nth-of-type(2):checked ~ .tabs__nav .tabs__label:nth-of-type(2),
+.tabs__radio:nth-of-type(3):checked ~ .tabs__nav .tabs__label:nth-of-type(3),
+.tabs__radio:nth-of-type(4):checked ~ .tabs__nav .tabs__label:nth-of-type(4),
+.tabs__radio:nth-of-type(5):checked ~ .tabs__nav .tabs__label:nth-of-type(5) {
+  border-bottom-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.tabs__radio:nth-of-type(1):checked ~ .tabs__panels > .tabs__panel:nth-of-type(1),
+.tabs__radio:nth-of-type(2):checked ~ .tabs__panels > .tabs__panel:nth-of-type(2),
+.tabs__radio:nth-of-type(3):checked ~ .tabs__panels > .tabs__panel:nth-of-type(3),
+.tabs__radio:nth-of-type(4):checked ~ .tabs__panels > .tabs__panel:nth-of-type(4),
+.tabs__radio:nth-of-type(5):checked ~ .tabs__panels > .tabs__panel:nth-of-type(5) {
+  display: block;
+}
+
+.tabs__radio:nth-of-type(1):focus-visible ~ .tabs__nav .tabs__label:nth-of-type(1),
+.tabs__radio:nth-of-type(2):focus-visible ~ .tabs__nav .tabs__label:nth-of-type(2),
+.tabs__radio:nth-of-type(3):focus-visible ~ .tabs__nav .tabs__label:nth-of-type(3),
+.tabs__radio:nth-of-type(4):focus-visible ~ .tabs__nav .tabs__label:nth-of-type(4),
+.tabs__radio:nth-of-type(5):focus-visible ~ .tabs__nav .tabs__label:nth-of-type(5) {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+  border-radius: 6px 6px 0 0;
+}
+
+/* Encabezado de cada sección dentro de una pestaña */
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.section-head h2 { margin: 0; font-size: 1.15rem; }
+.section-head p { margin: 2px 0 0; color: var(--color-muted); font-size: .88rem; }
+
+/* ---------- Formularios: textarea, solo lectura, ayudas ---------- */
+.form__group textarea {
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font: inherit;
+  background: var(--color-surface);
+  resize: vertical;
+  min-height: 110px;
+}
+
+.form__group textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, .2);
+}
+
+.form__group input[readonly],
+.form__group input:disabled,
+.form__group select:disabled {
+  background: var(--color-bg);
+  color: var(--color-muted);
+  cursor: not-allowed;
+}
+
+/* Evita que selects e inputs desborden la rejilla en modales pequeños */
+.form__grid > .form__group { min-width: 0; }
+.form__group select,
+.form__group input:not([type="checkbox"]):not([type="radio"]),
+.form__group textarea { width: 100%; min-width: 0; }
+
+.form__hint { margin: 0; color: var(--color-muted); font-size: .78rem; }
+
+.check-group { display: flex; flex-wrap: wrap; gap: 8px 14px; }
+.check-group label { display: inline-flex; align-items: center; gap: 6px; font-weight: 500; font-size: .88rem; }
+.check-group input { padding: 0; accent-color: var(--color-primary); }
+
+/* Formulario de página completa (paneles de reporte/incidente) */
+.form-card {
+  margin-bottom: 24px;
+  padding: 20px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.form-card__title { margin: 0 0 4px; font-size: 1.1rem; }
+.form-card__intro { margin: 0 0 16px; color: var(--color-muted); font-size: .88rem; }
+
+.form__actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+
+.subsection-title { margin: 0 0 12px; font-size: 1.05rem; }
+
+/* ---------- Filas de productos de una orden de compra ---------- */
+.modal--wide .modal__content { max-width: 820px; }
+
+.line-items { display: grid; gap: 8px; margin-top: 16px; }
+
+.line-items__head,
+.line-items__row {
+  display: grid;
+  grid-template-columns: 2.4fr 1fr 1.2fr 1.2fr 36px;
+  gap: 8px;
+  align-items: center;
+}
+
+.line-items__head {
+  color: var(--color-muted);
+  font-size: .72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.line-items__row input,
+.line-items__row select {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font: inherit;
+  background: var(--color-surface);
+}
+
+.line-items__row output { font-weight: 600; text-align: right; padding-right: 4px; }
+
+.line-items__remove {
+  width: 32px; height: 32px;
+  border: none;
+  border-radius: 6px;
+  background: #fef2f2;
+  color: var(--color-danger);
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.line-items__remove:hover { background: #fee2e2; }
+
+.line-items__total {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 6px;
+  padding-top: 10px;
+  border-top: 1px solid var(--color-border);
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+/* Tabla pequeña dentro de un modal (detalle de orden) */
+.mini-table { width: 100%; margin-top: 14px; border-collapse: collapse; font-size: .88rem; }
+.mini-table th { padding: 8px 6px; color: var(--color-muted); font-size: .72rem; text-align: left; text-transform: uppercase; border-bottom: 1px solid var(--color-border); }
+.mini-table td { padding: 8px 6px; border-bottom: 1px dashed var(--color-border); }
+.mini-table .num { text-align: right; }
+.mini-table tfoot td { border-bottom: none; font-weight: 700; }
+
+/* Texto largo dentro de celdas (descripciones) */
+.cell-text { max-width: 280px; color: var(--color-muted); }
+
+/* Valores numéricos alineados a la derecha */
+.data-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* ---------- Selector de fecha del corte de caja ---------- */
+.date-picker { display: flex; align-items: end; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; }
+.date-picker .form__group { min-width: 200px; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 720px) {
+  .tabs__nav { overflow-x: auto; flex-wrap: nowrap; }
+  .tabs__label { white-space: nowrap; }
+
+  .line-items__head { display: none; }
+  .line-items__row { grid-template-columns: 1fr 1fr; padding: 10px; border: 1px solid var(--color-border); border-radius: 8px; }
+  .line-items__row > :first-child { grid-column: 1 / -1; }
+  .line-items__row output { text-align: left; }
+
+  .mini-table .num { text-align: right; }
+  .data-table .num { text-align: right; }
+  .cell-text { max-width: none; }
+}

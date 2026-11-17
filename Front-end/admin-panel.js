@@ -69,7 +69,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const rol = celdas[5].textContent.trim().toLowerCase();
         campo("editar-rol").value =
-            rol.includes("administrador") ? "administrador" : "empleado";
+            rol.includes("administrador") ? "administrador" :
+            rol.includes("gerente") ? "gerente" : "empleado";
+
+        // La contraseña nunca se precarga: vacía = conservar la actual
+        campo("editar-password").value = "";
 
         const estado = celdas[6].textContent.trim().toLowerCase();
         campo("editar-estado").value =
@@ -110,6 +114,12 @@ document.addEventListener("DOMContentLoaded", function () {
             rol: campo("editar-rol").value,
             estado: campo("editar-estado").value
         };
+
+        // Solo se envía la contraseña si el administrador escribió una nueva
+        const nuevaPassword = campo("editar-password").value;
+        if (nuevaPassword) {
+            empleadoActualizado.password = nuevaPassword;
+        }
 
         // Mostrar los datos preparados para comprobar el funcionamiento.
         console.log("Datos del empleado preparados:", empleadoActualizado);

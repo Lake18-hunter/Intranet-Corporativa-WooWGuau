@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Panel de Administrador | Empleados</title>
   <link rel="stylesheet" href="admin-panel.css">
+  <link rel="stylesheet" href="panel-extras.css">
 </head>
 <script src="admin-panel.js"></script>
 <body>
@@ -12,10 +13,16 @@
   <!-- ===================== PANEL PRINCIPAL ===================== -->
   <main class="admin-panel" id="admin-panel">
 
+    <!-- Navegación entre paneles del rol -->
+    <nav class="panel-nav" aria-label="Paneles del administrador">
+      <a href="admin-panel.html" class="panel-nav__link panel-nav__link--current" aria-current="page">Empleados y credenciales</a>
+      <a href="admin-reportes.html" class="panel-nav__link">Reportes recibidos</a>
+    </nav>
+
     <header class="admin-panel__header">
       <div>
         <h1>Panel de Administrador</h1>
-        <p class="admin-panel__subtitle">Gestión de empleados · Acceso exclusivo para el rol <strong>Administrador</strong></p>
+        <p class="admin-panel__subtitle">Gestión de empleados y credenciales de acceso · Acceso exclusivo para el rol <strong>Administrador</strong></p>
       </div>
       <a href="#modal-crear" class="btn btn--primary">+ Nuevo empleado</a>
     </header>
@@ -89,12 +96,26 @@
               <a href="#modal-eliminar" class="btn btn--small btn--danger">Eliminar</a>
             </td>
           </tr>
+          <tr>
+            <td data-label="ID">004</td>
+            <td data-label="Nombre">Laura Méndez</td>
+            <td data-label="Correo">laura.mendez@empresa.com</td>
+            <td data-label="Puesto">Gerente de tienda</td>
+            <td data-label="Departamento">Operaciones</td>
+            <td data-label="Rol"><span class="badge badge--role">Gerente</span></td>
+            <td data-label="Estado"><span class="badge badge--active">Activo</span></td>
+            <td data-label="Acciones" class="data-table__actions">
+              <a href="#modal-ver" class="btn btn--small btn--ghost">Ver</a>
+              <a href="#modal-editar" class="btn btn--small btn--secondary">Editar</a>
+              <a href="#modal-eliminar" class="btn btn--small btn--danger">Eliminar</a>
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>
 
     <footer class="admin-panel__footer">
-      <span>Mostrando 3 de 3 empleados</span>
+      <span>Mostrando 4 de 4 empleados</span>
       <nav class="pagination" aria-label="Paginación">
         <a href="#" class="pagination__link pagination__link--disabled">‹ Anterior</a>
         <a href="#" class="pagination__link pagination__link--current">1</a>
@@ -117,6 +138,15 @@
         <a href="#admin-panel" class="modal__close" aria-label="Cerrar">×</a>
       </header>
       <form class="form" id="form-crear" action="#" method="post">
+        <!-- El gerente solo da de alta el expediente; el administrador crea las credenciales -->
+        <div class="form__group" style="margin-bottom:16px;">
+          <label for="crear-expediente">Expediente del empleado</label>
+          <select id="crear-expediente" name="id_expediente">
+            <option value="">Crear empleado nuevo</option>
+            <option value="3">Ana López · dado de alta por el gerente, sin credenciales</option>
+          </select>
+          <p class="form__hint">Si el gerente ya registró al empleado, selecciónalo para asignarle su acceso en lugar de duplicarlo.</p>
+        </div>
         <div class="form__grid">
           <div class="form__group">
             <label for="crear-nombre">Nombre completo</label>
@@ -144,6 +174,7 @@
             <label for="crear-rol">Rol</label>
             <select id="crear-rol" name="rol" required>
               <option value="empleado">Empleado</option>
+              <option value="gerente">Gerente</option>
               <option value="administrador">Administrador</option>
             </select>
           </div>
@@ -203,6 +234,7 @@
             <label for="editar-rol">Rol</label>
             <select id="editar-rol" name="rol" required>
               <option value="empleado">Empleado</option>
+              <option value="gerente">Gerente</option>
               <option value="administrador">Administrador</option>
             </select>
           </div>
@@ -212,6 +244,11 @@
               <option value="activo">Activo</option>
               <option value="inactivo">Inactivo</option>
             </select>
+          </div>
+          <div class="form__group form__group--full">
+            <label for="editar-password">Nueva contraseña (opcional)</label>
+            <input type="password" id="editar-password" name="password" minlength="8" autocomplete="new-password">
+            <p class="form__hint">Déjala vacía para conservar la contraseña actual. El correo de acceso es el que aparece arriba.</p>
           </div>
         </div>
         <footer class="modal__footer">

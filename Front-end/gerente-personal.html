@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de Gerente | Personal</title>
+  <link rel="stylesheet" href="gerente-panel.css">
+  <link rel="stylesheet" href="panel-extras.css">
+</head>
+<body>
+
+  <!-- ===================== PANEL PRINCIPAL ===================== -->
+  <main class="mgr-panel" id="mgr-panel">
+
+    <!-- Navegación entre paneles del rol -->
+    <nav class="panel-nav" aria-label="Paneles del gerente">
+      <a href="gerente-personal.html" class="panel-nav__link panel-nav__link--current" aria-current="page">Personal</a>
+      <a href="gerente-compras.html" class="panel-nav__link">Compras e inventario</a>
+      <a href="gerente-reporte.html" class="panel-nav__link">Reporte al administrador</a>
+    </nav>
+
+    <header class="mgr-panel__header">
+      <div>
+        <h1>Gestión de personal</h1>
+        <p class="mgr-panel__subtitle">Alta de empleados, horarios, asistencia e incidencias · Acceso para el rol <strong>Gerente</strong></p>
+      </div>
+      <span class="badge badge--role">Rol: Gerente</span>
+    </header>
+
+    <!-- ===================== PESTAÑAS (solo CSS) ===================== -->
+    <div class="tabs">
+      <input type="radio" name="tab-personal" id="tab-empleados" class="tabs__radio" checked>
+      <input type="radio" name="tab-personal" id="tab-horarios" class="tabs__radio">
+      <input type="radio" name="tab-personal" id="tab-asistencia" class="tabs__radio">
+      <input type="radio" name="tab-personal" id="tab-incidencias" class="tabs__radio">
+
+      <div class="tabs__nav" role="tablist" aria-label="Secciones de personal">
+        <label for="tab-empleados" class="tabs__label">Empleados</label>
+        <label for="tab-horarios" class="tabs__label">Horarios</label>
+        <label for="tab-asistencia" class="tabs__label">Asistencia</label>
+        <label for="tab-incidencias" class="tabs__label">Incidencias</label>
+      </div>
+
+      <div class="tabs__panels">
+
+        <!-- ============ 1. EMPLEADOS (solo alta) ============ -->
+        <section class="tabs__panel" id="seccion-empleados" aria-label="Empleados">
+          <div class="section-head">
+            <div>
+              <h2>Expedientes de empleados</h2>
+              <p>Puedes dar de alta empleados. Editar o quitar corresponde al administrador.</p>
+            </div>
+            <a href="#modal-emp-crear" class="btn btn--primary">+ Nuevo empleado</a>
+          </div>
+
+          <p class="notice">
+            El alta crea solo el <strong>expediente</strong>. El empleado no podrá iniciar sesión hasta que el administrador
+            le cree sus credenciales de acceso.
+          </p>
+
+          <section class="toolbar" aria-label="Filtros de empleados">
+            <input type="search" id="buscar-empleado" class="toolbar__search" placeholder="Buscar por nombre, correo o puesto…" aria-label="Buscar empleados">
+            <select id="filtro-acceso" class="toolbar__select" aria-label="Filtrar por acceso">
+              <option value="">Todos</option>
+              <option value="con">Con credenciales</option>
+              <option value="sin">Sin credenciales</option>
+            </select>
+          </section>
+
+          <div class="table-wrapper">
+            <table class="data-table" id="tabla-empleados">
+              <caption class="sr-only">Listado de empleados</caption>
+              <thead>
+                <tr>
+                  <th scope="col">ID</th>
+                  <th scope="col">Nombre</th>
+                  <th scope="col">Correo</th>
+                  <th scope="col">Puesto</th>
+                  <th scope="col">Ingreso</th>
+                  <th scope="col">Acceso al sistema</th>
+                  <th scope="col">Estado</th>
+                  <th scope="col" class="data-table__actions-col">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-label="ID">002</td>
+                  <td data-label="Nombre">Carlos Ramírez</td>
+                  <td data-label="Correo">carlos.ramirez@woowguau.com</td>
+                  <td data-label="Puesto">Cajero</td>
+                  <td data-label="Ingreso">02/03/2026</td>
+                  <td data-label="Acceso al sistema"><span class="badge badge--success">Con credenciales</span></td>
+                  <td data-label="Estado"><span class="badge badge--active">Activo</span></td>
+                  <td data-label="Acciones" class="data-table__actions">
+                    <a href="#modal-emp-ver" class="btn btn--small btn--ghost">Ver</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td data-label="ID">003</td>
+                  <td data-label="Nombre">Ana López</td>
+                  <td data-label="Correo">ana.lopez@woowguau.com</td>
+                  <td data-label="Puesto">Cajera</td>
+                  <td data-label="Ingreso">10/11/2026</td>
+                  <td data-label="Acceso al sistema"><span class="badge badge--warning">Sin credenciales</span></td>
+                  <td data-label="Estado"><span class="badge badge--active">Activo</span></td>
+                  <td data-label="Acciones" class="data-table__actions">
+                    <a href="#modal-emp-ver" class="btn btn--small btn--ghost">Ver</a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ============ 2. HORARIOS ============ -->
+        <section class="tabs__panel" id="seccion-horarios" aria-label="Horarios">
+          <div class="section-head">
+            <div>
+              <h2>Horario semanal</h2>
+              <p>Un horario por empleado, con los días y la franja de entrada y salida.</p>
+            </div>
+            <a href="#modal-hor-crear" class="btn btn--primary">+ Nuevo horario</a>
+          </div>
+
+          <div class="table-wrapper">
+            <table class="data-table" id="tabla-horarios">
+              <caption class="sr-only">Horarios de los empleados</caption>
+              <thead>
+                <tr>
+                  <th scope="col">ID</th>
+                  <th scope="col">Empleado</th>
+                  <th scope="col">Días</th>
+                  <th scope="col">Entrada</th>
+                  <th scope="col">Salida</th>
+                  <th scope="col">Vigente desde</th>
+                  <th scope="col" class="data-table__actions-col">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-label="ID">001</td>
+                  <td data-label="Empleado">Carlos Ramírez</td>
+                  <td data-label="Días">Lun – Sáb</td>
+                  <td data-label="Entrada">09:00</td>
+                  <td data-label="Salida">18:00</td>
+                  <td data-label="Vigente desde">02/03/2026</td>
+                  <td data-label="Acciones" class="data-table__actions">
+                    <a href="#modal-hor-editar" class="btn btn--small btn--secondary">Editar</a>
+                    <a href="#modal-hor-eliminar" class="btn btn--small btn--danger">Eliminar</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td data-label="ID">002</td>
+                  <td data-label="Empleado">Ana López</td>
+                  <td data-label="Días">Mar – Dom</td>
+                  <td data-label="Entrada">10:00</td>
+                  <td data-label="Salida">19:00</td>
+                  <td data-label="Vigente desde">17/11/2026</td>
+                  <td data-label="Acciones" class="data-table__actions">
+                    <a href="#modal-hor-editar" class="btn btn--small btn--secondary">Editar</a>
+                    <a href="#modal-hor-eliminar" class="btn btn--small btn--danger">Eliminar</a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ============ 3. ASISTENCIA ============ -->
+        <section class="tabs__panel" id="seccion-asistencia" aria-label="Asistencia">
+          <div class="section-head">
+            <div>
+              <h2>Registro de asistencia</h2>
+              <p>Entradas, salidas, retardos, faltas y permisos.</p>
+            </div>
+            <a href="#modal-asi-crear" class="btn btn--primary">+ Registrar asistencia</a>
+          </div>
+
+          <section class="toolbar" aria-label="Filtros de asistencia">
+            <input type="date" id="filtro-fecha-asistencia" class="toolbar__select" aria-label="Filtrar por fecha">
+            <select id="filtro-empleado-asistencia" class="toolbar__select" aria-label="Filtrar por empleado">
+              <option value="">Todos los empleados</option>
+              <option value="2">Carlos Ramírez</option>
+              <option value="3">Ana López</option>
+            </select>
+            <select id="filtro-estatus-asistencia" class="toolbar__select" aria-label="Filtrar por estatus">
+              <option value="">Todos los estatus</option>
+              <option value="asistencia">Asistencia</option>
+              <option value="retardo">Retardo</option>
+              <option value="falta">Falta</option>
+              <option value="permiso">Permiso</option>
+            </select>
+          </section>
+
+          <div class="table-wrapper">
+            <table class="data-table" id="tabla-asistencia">
+              <caption class="sr-only">Registro de asistencia</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Fecha</th>
+                  <th scope="col">Empleado</th>
+                  <th scope="col">Entrada</th>
+                  <th scope="col">Salida</th>
+                  <th scope="col">Estatus</th>
+                  <th scope="col">Observaciones</th>
+                  <th scope="col" class="data-table__actions-col">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-label="Fecha">16/11/2026</td>
+                  <td data-label="Empleado">Carlos Ramírez</td>
+                  <td data-label="Entrada">09:02</td>
+                  <td data-label="Salida">—</td>
+                  <td data-label="Estatus"><span class="badge badge--success">Asistencia</span></td>
+                  <td data-label="Observaciones" class="cell-text">—</td>
+                  <td data-label="Acciones" class="data-table__actions">
+                    <a href="#modal-asi-editar" class="btn btn--small btn--secondary">Editar</a>
+                    <a href="#modal-asi-eliminar" class="btn btn--small btn--danger">Eliminar</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td data-label="Fecha">15/11/2026</td>
+                  <td data-label="Empleado">Carlos Ramírez</td>
+                  <td data-label="Entrada">09:25</td>
+                  <td data-label="Salida">18:03</td>
+                  <td data-label="Estatus"><span class="badge badge--warning">Retardo</span></td>
+                  <td data-label="Observaciones" class="cell-text">Tráfico en la zona</td>
+                  <td data-label="Acciones" class="data-table__actions">
+                    <a href="#modal-asi-editar" class="btn btn--small btn--secondary">Editar</a>
+                    <a href="#modal-asi-eliminar" class="btn btn--small btn--danger">Eliminar</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td data-label="Fecha">14/11/2026</td>
+                  <td data-label="Empleado">Ana López</td>
+                  <td data-label="Entrada">—</td>
+                  <td data-label="Salida">—</td>
+                  <td data-label="Estatus"><span class="badge badge--danger">Falta</span></td>
+                  <td data-label="Observaciones" class="cell-text">Sin aviso previo</td>
+                  <td data-label="Acciones" class="data-table__actions">
+                    <a href="#modal-asi-editar" class="btn btn--small btn--secondary">Editar</a>
+                    <a href="#modal-asi-eliminar" class="btn btn--small btn--danger">Eliminar</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td data-label="Fecha">13/11/2026</td>
+                  <td data-label="Empleado">Ana López</td>
+                  <td data-label="Entrada">—</td>
+                  <td data-label="Salida">—</td>
+                  <td data-label="Estatus"><span class="badge badge--info">Permiso</span></td>
+                  <td data-label="Observaciones" class="cell-text">Cita médica</td>
+                  <td data-label="Acciones" class="data-table__actions">
+                    <a href="#modal-asi-editar" class="btn btn--small btn--secondary">Editar</a>
+                    <a href="#modal-asi-eliminar" class="btn btn--small btn--danger">Eliminar</a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ============ 4. INCIDENCIAS LABORALES ============ -->
+        <section class="tabs__panel" id="seccion-incidencias" aria-label="Incidencias laborales">
+          <div class="section-head">
+            <div>
+              <h2>Incidencias laborales</h2>
+              <p>Llamadas de atención, actas, reconocimientos y otras situaciones del personal.</p>
+            </div>
+            <a href="#modal-inc-crear" class="btn btn--primary">+ Nueva incidencia</a>
+          </div>
+
+          <div class="table-wrapper">
+            <table class="data-table" id="tabla-incidencias">
+              <caption class="sr-only">Incidencias laborales</caption>
+              <thead>
+                <tr>
+                  <th scope="col">ID</th>
+                  <th scope="col">Fecha</th>
+                  <th scope="col">Empleado</th>
+                  <th scope="col">Tipo</th>
+                  <th scope="col">Descripción</th>
+                  <th scope="col" class="data-table__actions-col">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-label="ID">002</td>
+                  <td data-label="Fecha">15/11/2026</td>
+                  <td data-label="Empleado">Carlos Ramírez</td>
+                  <td data-label="Tipo"><span class="badge badge--warning">Llamada de atención</span></td>
+                  <td data-label="Descripción" class="cell-text">Segundo retardo en el mes.</td>
+                  <td data-label="Acciones" class="data-table__actions">
+                    <a href="#modal-inc-editar" class="btn btn--small btn--secondary">Editar</a>
+                    <a href="#modal-inc-eliminar" class="btn btn--small btn--danger">Eliminar</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td data-label="ID">001</td>
+                  <td data-label="Fecha">08/11/2026</td>
+                  <td data-label="Empleado">Ana López</td>
+                  <td data-label="Tipo"><span class="badge badge--success">Reconocimiento</span></td>
+                  <td data-label="Descripción" class="cell-text">Excelente atención a clientes durante el fin de semana.</td>
+                  <td data-label="Acciones" class="data-table__actions">
+                    <a href="#modal-inc-editar" class="btn btn--small btn--secondary">Editar</a>
+                    <a href="#modal-inc-eliminar" class="btn btn--small btn--danger">Eliminar</a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+      </div><!-- /.tabs__panels -->
+    </div><!-- /.tabs -->
+
+    <footer class="mgr-panel__footer">
+      <span>Datos de prueba · Gestión de personal</span>
+      <nav class="pagination" aria-label="Paginación">
+        <a href="#" class="pagination__link pagination__link--disabled">‹ Anterior</a>
+        <a href="#" class="pagination__link pagination__link--current">1</a>
+        <a href="#" class="pagination__link pagination__link--disabled">Siguiente ›</a>
+      </nav>
+    </footer>
+  </main>
+
+  <!-- ===================== MODALES (OCULTOS) =====================
+       Se muestran con :target (sin JavaScript). Para cerrarlos,
+       el enlace apunta a "#mgr-panel". -->
+
+  <!-- ---------- EMPLEADOS ---------- -->
+
+  <!-- MODAL: Alta de empleado (sin contraseña) -->
+  <div class="modal" id="modal-emp-crear" role="dialog" aria-modal="true" aria-labelledby="titulo-emp-crear">
+    <a href="#mgr-panel" class="modal__overlay" aria-label="Cerrar"></a>
+    <div class="modal__content">
+      <header class="modal__header">
+        <h2 id="titulo-emp-crear">Nuevo empleado</h2>
+        <a href="#mgr-panel" class="modal__close" aria-label="Cerrar">×</a>
+      </header>
+      <form class="form" id="form-emp-crear" action="#" method="post">
+        <div class="form__grid">
+          <div class="form__group">
+            <label for="emp-nombre">Nombre completo</label>
+            <input type="text" id="emp-nombre" name="nombre" required>
+          </div>
+          <div class="form__group">
+            <label for="emp-correo">Correo electrónico</label>
+            <input type="email" id="emp-correo" name="correo" required>
+          </div>
+          <div class="form__group">
+            <label for="emp-puesto">Puesto</label>
+            <input type="text" id="emp-puesto" name="puesto" required>
+          </div>
+          <div class="form__group">
+            <label for="emp-telefono">Teléfono</label>
+            <input type="tel" id="emp-telefono" name="telefono">
+          </div>
+          <div class="form__group">
+            <label for="emp-ingreso">Fecha de ingreso</label>
+            <input type="date" id="emp-ingreso" name="fecha_ingreso" required>
+          </div>
+          <div class="form__group">
+            <label for="emp-estado">Estado</label>
+            <select id="emp-estado" name="estado">
+              <option value="activo">Activo</option>
+              <option value="inactivo">Inactivo</option>
+            </select>
+          </div>
+        </div>
+        <p class="notice" style="margin-top:16px;">
+          No se solicita contraseña: el administrador creará las credenciales de acceso.
+        </p>
+        <footer class="modal__footer">
+          <a href="#mgr-panel" class="btn btn--ghost">Cancelar</a>
+          <button type="submit" class="btn btn--primary">Guardar expediente</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Ver empleado -->
+  <div class="modal" id="modal-emp-ver" role="dialog" aria-modal="true" aria-labelledby="titulo-emp-ver">
+    <a href="#mgr-panel" class="modal__overlay" aria-label="Cerrar"></a>
+    <div class="modal__content">
+      <header class="modal__header">
+        <h2 id="titulo-emp-ver">Detalle del empleado</h2>
+        <a href="#mgr-panel" class="modal__close" aria-label="Cerrar">×</a>
+      </header>
+      <dl class="detail">
+        <div><dt>ID</dt><dd id="ver-emp-id">—</dd></div>
+        <div><dt>Nombre</dt><dd id="ver-emp-nombre">—</dd></div>
+        <div><dt>Correo</dt><dd id="ver-emp-correo">—</dd></div>
+        <div><dt>Puesto</dt><dd id="ver-emp-puesto">—</dd></div>
+        <div><dt>Teléfono</dt><dd id="ver-emp-telefono">—</dd></div>
+        <div><dt>Fecha de ingreso</dt><dd id="ver-emp-ingreso">—</dd></div>
+        <div><dt>Acceso al sistema</dt><dd id="ver-emp-acceso">—</dd></div>
+        <div><dt>Estado</dt><dd id="ver-emp-estado">—</dd></div>
+      </dl>
+      <footer class="modal__footer">
+        <a href="#mgr-panel" class="btn btn--primary">Cerrar</a>
+      </footer>
+    </div>
+  </div>
+
+  <!-- ---------- HORARIOS ---------- -->
+
+  <!-- MODAL: Crear horario -->
+  <div class="modal" id="modal-hor-crear" role="dialog" aria-modal="true" aria-labelledby="titulo-hor-crear">
+    <a href="#mgr-panel" class="modal__overlay" aria-label="Cerrar"></a>
+    <div class="modal__content">
+      <header class="modal__header">
+        <h2 id="titulo-hor-crear">Nuevo horario</h2>
+        <a href="#mgr-panel" class="modal__close" aria-label="Cerrar">×</a>
+      </header>
+      <form class="form" id="form-hor-crear" action="#" method="post">
+        <div class="form__grid">
+          <div class="form__group form__group--full">
+            <label for="hor-empleado">Empleado</label>
+            <select id="hor-empleado" name="id_empleado" required>
+              <option value="">Seleccionar…</option>
+              <option value="2">Carlos Ramírez</option>
+              <option value="3">Ana López</option>
+            </select>
+          </div>
+          <div class="form__group form__group--full">
+            <label>Días laborales</label>
+            <div class="check-group">
+              <label><input type="checkbox" name="dias" value="lun"> Lun</label>
+              <label><input type="checkbox" name="dias" value="mar"> Mar</label>
+              <label><input type="checkbox" name="dias" value="mie"> Mié</label>
+              <label><input type="checkbox" name="dias" value="jue"> Jue</label>
+              <label><input type="checkbox" name="dias" value="vie"> Vie</label>
+              <label><input type="checkbox" name="dias" value="sab"> Sáb</label>
+              <label><input type="checkbox" name="dias" value="dom"> Dom</label>
+            </div>
+          </div>
+          <div class="form__group">
+            <label for="hor-entrada">Hora de entrada</label>
+            <input type="time" id="hor-entrada" name="hora_entrada" required>
+          </div>
+          <div class="form__group">
+            <label for="hor-salida">Hora de salida</label>
+            <input type="time" id="hor-salida" name="hora_salida" required>
+          </div>
+          <div class="form__group form__group--full">
+            <label for="hor-vigente">Vigente desde</label>
+            <input type="date" id="hor-vigente" name="vigente_desde" required>
+          </div>
+        </div>
+        <footer class="modal__footer">
+          <a href="#mgr-panel" class="btn btn--ghost">Cancelar</a>
+          <button type="submit" class="btn btn--primary">Guardar</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Editar horario -->
+  <div class="modal" id="modal-hor-editar" role="dialog" aria-modal="true" aria-labelledby="titulo-hor-editar">
+    <a href="#mgr-panel" class="modal__overlay" aria-label="Cerrar"></a>
+    <div class="modal__content">
+      <header class="modal__header">
+        <h2 id="titulo-hor-editar">Editar horario</h2>
+        <a href="#mgr-panel" class="modal__close" aria-label="Cerrar">×</a>
+      </header>
+      <form class="form" id="form-hor-editar" action="#" method="post">
+        <input type="hidden" id="editar-hor-id" name="id_horario">
+        <div class="form__grid">
+          <div class="form__group form__group--full">
+            <label for="editar-hor-empleado">Empleado</label>
+            <select id="editar-hor-empleado" name="id_empleado" required>
+              <option value="2">Carlos Ramírez</option>
+              <option value="3">Ana López</option>
+            </select>
+          </div>
+          <div class="form__group form__group--full">
+            <label>Días laborales</label>
+            <div class="check-group">
+              <label><input type="checkbox" name="dias" value="lun"> Lun</label>
+              <label><input type="checkbox" name="dias" value="mar"> Mar</label>
+              <label><input type="checkbox" name="dias" value="mie"> Mié</label>
+              <label><input type="checkbox" name="dias" value="jue"> Jue</label>
+              <label><input type="checkbox" name="dias" value="vie"> Vie</label>
+              <label><input type="checkbox" name="dias" value="sab"> Sáb</label>
+              <label><input type="checkbox" name="dias" value="dom"> Dom</label>
+            </div>
+          </div>
+          <div class="form__group">
+            <label for="editar-hor-entrada">Hora de entrada</label>
+            <input type="time" id="editar-hor-entrada" name="hora_entrada" required>
+          </div>
+          <div class="form__group">
+            <label for="editar-hor-salida">Hora de salida</label>
+            <input type="time" id="editar-hor-salida" name="hora_salida" required>
+          </div>
+          <div class="form__group form__group--full">
+            <label for="editar-hor-vigente">Vigente desde</label>
+            <input type="date" id="editar-hor-vigente" name="vigente_desde" required>
+          </div>
+        </div>
+        <footer class="modal__footer">
+          <a href="#mgr-panel" class="btn btn--ghost">Cancelar</a>
+          <button type="submit" class="btn btn--primary">Guardar cambios</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Eliminar horario -->
+  <div class="modal modal--small" id="modal-hor-eliminar" role="alertdialog" aria-modal="true" aria-labelledby="titulo-hor-eliminar">
+    <a href="#mgr-panel" class="modal__overlay" aria-label="Cerrar"></a>
+    <div class="modal__content">
+      <header class="modal__header">
+        <h2 id="titulo-hor-eliminar">Eliminar horario</h2>
+        <a href="#mgr-panel" class="modal__close" aria-label="Cerrar">×</a>
+      </header>
+      <p class="modal__text">
+        ¿Seguro que deseas eliminar el horario de <strong id="eliminar-hor-nombre">este empleado</strong>?
+        Esta acción no se puede deshacer.
+      </p>
+      <form id="form-hor-eliminar" action="#" method="post">
+        <input type="hidden" id="eliminar-hor-id" name="id_horario">
+        <footer class="modal__footer">
+          <a href="#mgr-panel" class="btn btn--ghost">Cancelar</a>
+          <button type="submit" class="btn btn--danger-solid">Sí, eliminar</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <!-- ---------- ASISTENCIA ---------- -->
+
+  <!-- MODAL: Registrar asistencia -->
+  <div class="modal" id="modal-asi-crear" role="dialog" aria-modal="true" aria-labelledby="titulo-asi-crear">
+    <a href="#mgr-panel" class="modal__overlay" aria-label="Cerrar"></a>
+    <div class="modal__content">
+      <header class="modal__header">
+        <h2 id="titulo-asi-crear">Registrar asistencia</h2>
+        <a href="#mgr-panel" class="modal__close" aria-label="Cerrar">×</a>
+      </header>
+      <form class="form" id="form-asi-crear" action="#" method="post">
+        <div class="form__grid">
+          <div class="form__group">
+            <label for="asi-empleado">Empleado</label>
+            <select id="asi-empleado" name="id_empleado" required>
+              <option value="">Seleccionar…</option>
+              <option value="2">Carlos Ramírez</option>
+              <option value="3">Ana López</option>
+            </select>
+          </div>
+          <div class="form__group">
+            <label for="asi-fecha">Fecha</label>
+            <input type="date" id="asi-fecha" name="fecha" required>
+          </div>
+          <div class="form__group">
+            <label for="asi-entrada">Hora de entrada</label>
+            <input type="time" id="asi-entrada" name="hora_entrada">
+          </div>
+          <div class="form__group">
+            <label for="asi-salida">Hora de salida</label>
+            <input type="time" id="asi-salida" name="hora_salida">
+          </div>
+          <div class="form__group form__group--full">
+            <label for="asi-estatus">Estatus</label>
+            <select id="asi-estatus" name="estatus" required>
+              <option value="asistencia">Asistencia</option>
+              <option value="retardo">Retardo</option>
+              <option value="falta">Falta</option>
+              <option value="permiso">Permiso</option>
+            </select>
+          </div>
+          <div class="form__group form__group--full">
+            <label for="asi-obs">Observaciones</label>
+            <input type="text" id="asi-obs" name="observaciones">
+          </div>
+        </div>
+        <footer class="modal__footer">
+          <a href="#mgr-panel" class="btn btn--ghost">Cancelar</a>
+          <button type="submit" class="btn btn--primary">Guardar</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Editar asistencia -->
+  <div class="modal" id="modal-asi-editar" role="dialog" aria-modal="true" aria-labelledby="titulo-asi-editar">
+    <a href="#mgr-panel" class="modal__overlay" aria-label="Cerrar"></a>
+    <div class="modal__content">
+      <header class="modal__header">
+        <h2 id="titulo-asi-editar">Editar asistencia</h2>
+        <a href="#mgr-panel" class="modal__close" aria-label="Cerrar">×</a>
+      </header>
+      <form class="form" id="form-asi-editar" action="#" method="post">
+        <input type="hidden" id="editar-asi-id" name="id_asistencia">
+        <div class="form__grid">
+          <div class="form__group">
+            <label for="editar-asi-empleado">Empleado</label>
+            <select id="editar-asi-empleado" name="id_empleado" required>
+              <option value="2">Carlos Ramírez</option>
+              <option value="3">Ana López</option>
+            </select>
+          </div>
+          <div class="form__group">
+            <label for="editar-asi-fecha">Fecha</label>
+            <input type="date" id="editar-asi-fecha" name="fecha" required>
+          </div>
+          <div class="form__group">
+            <label for="editar-asi-entrada">Hora de entrada</label>
+            <input type="time" id="editar-asi-entrada" name="hora_entrada">
+          </div>
+          <div class="form__group">
+            <label for="editar-asi-salida">Hora de salida</label>
+            <input type="time" id="editar-asi-salida" name="hora_salida">
+          </div>
+          <div class="form__group form__group--full">
+            <label for="editar-asi-estatus">Estatus</label>
+            <select id="editar-asi-estatus" name="estatus" required>
+              <option value="asistencia">Asistencia</option>
+              <option value="retardo">Retardo</option>
+              <option value="falta">Falta</option>
+              <option value="permiso">Permiso</option>
+            </select>
+          </div>
+          <div class="form__group form__group--full">
+            <label for="editar-asi-obs">Observaciones</label>
+            <input type="text" id="editar-asi-obs" name="observaciones">
+          </div>
+        </div>
+        <footer class="modal__footer">
+          <a href="#mgr-panel" class="btn btn--ghost">Cancelar</a>
+          <button type="submit" class="btn btn--primary">Guardar cambios</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Eliminar asistencia -->
+  <div class="modal modal--small" id="modal-asi-eliminar" role="alertdialog" aria-modal="true" aria-labelledby="titulo-asi-eliminar">
+    <a href="#mgr-panel" class="modal__overlay" aria-label="Cerrar"></a>
+    <div class="modal__content">
+      <header class="modal__header">
+        <h2 id="titulo-asi-eliminar">Eliminar registro</h2>
+        <a href="#mgr-panel" class="modal__close" aria-label="Cerrar">×</a>
+      </header>
+      <p class="modal__text">
+        ¿Seguro que deseas eliminar el registro de asistencia de <strong id="eliminar-asi-nombre">este empleado</strong>?
+        Esta acción no se puede deshacer.
+      </p>
+      <form id="form-asi-eliminar" action="#" method="post">
+        <input type="hidden" id="eliminar-asi-id" name="id_asistencia">
+        <footer class="modal__footer">
+          <a href="#mgr-panel" class="btn btn--ghost">Cancelar</a>
+          <button type="submit" class="btn btn--danger-solid">Sí, eliminar</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <!-- ---------- INCIDENCIAS LABORALES ---------- -->
+
+  <!-- MODAL: Crear incidencia -->
+  <div class="modal" id="modal-inc-crear" role="dialog" aria-modal="true" aria-labelledby="titulo-inc-crear">
+    <a href="#mgr-panel" class="modal__overlay" aria-label="Cerrar"></a>
+    <div class="modal__content">
+      <header class="modal__header">
+        <h2 id="titulo-inc-crear">Nueva incidencia laboral</h2>
+        <a href="#mgr-panel" class="modal__close" aria-label="Cerrar">×</a>
+      </header>
+      <form class="form" id="form-inc-crear" action="#" method="post">
+        <div class="form__grid">
+          <div class="form__group">
+            <label for="inc-empleado">Empleado</label>
+            <select id="inc-empleado" name="id_empleado" required>
+              <option value="">Seleccionar…</option>
+              <option value="2">Carlos Ramírez</option>
+              <option value="3">Ana López</option>
+            </select>
+          </div>
+          <div class="form__group">
+            <label for="inc-fecha">Fecha</label>
+            <input type="date" id="inc-fecha" name="fecha" required>
+          </div>
+          <div class="form__group form__group--full">
+            <label for="inc-tipo">Tipo</label>
+            <select id="inc-tipo" name="tipo" required>
+              <option value="llamada_atencion">Llamada de atención</option>
+              <option value="acta">Acta administrativa</option>
+              <option value="reconocimiento">Reconocimiento</option>
+              <option value="otro">Otro</option>
+            </select>
+          </div>
+          <div class="form__group form__group--full">
+            <label for="inc-descripcion">Descripción</label>
+            <textarea id="inc-descripcion" name="descripcion" rows="4" required></textarea>
+          </div>
+        </div>
+        <footer class="modal__footer">
+          <a href="#mgr-panel" class="btn btn--ghost">Cancelar</a>
+          <button type="submit" class="btn btn--primary">Guardar</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Editar incidencia -->
+  <div class="modal" id="modal-inc-editar" role="dialog" aria-modal="true" aria-labelledby="titulo-inc-editar">
+    <a href="#mgr-panel" class="modal__overlay" aria-label="Cerrar"></a>
+    <div class="modal__content">
+      <header class="modal__header">
+        <h2 id="titulo-inc-editar">Editar incidencia laboral</h2>
+        <a href="#mgr-panel" class="modal__close" aria-label="Cerrar">×</a>
+      </header>
+      <form class="form" id="form-inc-editar" action="#" method="post">
+        <input type="hidden" id="editar-inc-id" name="id_incidencia">
+        <div class="form__grid">
+          <div class="form__group">
+            <label for="editar-inc-empleado">Empleado</label>
+            <select id="editar-inc-empleado" name="id_empleado" required>
+              <option value="2">Carlos Ramírez</option>
+              <option value="3">Ana López</option>
+            </select>
+          </div>
+          <div class="form__group">
+            <label for="editar-inc-fecha">Fecha</label>
+            <input type="date" id="editar-inc-fecha" name="fecha" required>
+          </div>
+          <div class="form__group form__group--full">
+            <label for="editar-inc-tipo">Tipo</label>
+            <select id="editar-inc-tipo" name="tipo" required>
+              <option value="llamada_atencion">Llamada de atención</option>
+              <option value="acta">Acta administrativa</option>
+              <option value="reconocimiento">Reconocimiento</option>
+              <option value="otro">Otro</option>
+            </select>
+          </div>
+          <div class="form__group form__group--full">
+            <label for="editar-inc-descripcion">Descripción</label>
+            <textarea id="editar-inc-descripcion" name="descripcion" rows="4" required></textarea>
+          </div>
+        </div>
+        <footer class="modal__footer">
+          <a href="#mgr-panel" class="btn btn--ghost">Cancelar</a>
+          <button type="submit" class="btn btn--primary">Guardar cambios</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Eliminar incidencia -->
+  <div class="modal modal--small" id="modal-inc-eliminar" role="alertdialog" aria-modal="true" aria-labelledby="titulo-inc-eliminar">
+    <a href="#mgr-panel" class="modal__overlay" aria-label="Cerrar"></a>
+    <div class="modal__content">
+      <header class="modal__header">
+        <h2 id="titulo-inc-eliminar">Eliminar incidencia</h2>
+        <a href="#mgr-panel" class="modal__close" aria-label="Cerrar">×</a>
+      </header>
+      <p class="modal__text">
+        ¿Seguro que deseas eliminar la incidencia de <strong id="eliminar-inc-nombre">este empleado</strong>?
+        Esta acción no se puede deshacer.
+      </p>
+      <form id="form-inc-eliminar" action="#" method="post">
+        <input type="hidden" id="eliminar-inc-id" name="id_incidencia">
+        <footer class="modal__footer">
+          <a href="#mgr-panel" class="btn btn--ghost">Cancelar</a>
+          <button type="submit" class="btn btn--danger-solid">Sí, eliminar</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+</body>
+</html>

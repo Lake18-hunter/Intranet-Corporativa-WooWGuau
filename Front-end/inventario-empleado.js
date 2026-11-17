@@ -1,10 +1,18 @@
 /* =====================================================
    Panel de Empleado - Lógica de Inventario (WooWGuau)
+   - Consulta de stock con actualización automática (cada 12 s, sin websockets)
+   - Registro de salidas: venta, merma y uso interno
+   - El stock ya NO se suma ni resta a mano: sube con las órdenes
+     recibidas y baja con las salidas; los ajustes los hace el gerente.
    ===================================================== */
+
+const INTERVALO_ACTUALIZACION_MS = 12000;   // decisión 7: entre 10 y 15 segundos
+let ultimaConsulta = "";                    // conserva los filtros en cada actualización
 
 document.addEventListener("DOMContentLoaded", () => {
     cargarCatalogos();
     cargarProductos();
+    iniciarActualizacionAutomatica();
 
     // Filtros
     const filterForm = document.getElementById("filter-form");
@@ -17,107 +25,137 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Crear Producto
-    const formCrear = document.getElementById("form-crear-producto");
-    if (formCrear) {
-        formCrear.addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const formData = new FormData(formCrear);
-            try {
-                const response = await fetch("/inventario/productos/", { method: "POST", body: formData });
-                if (response.ok) {
-                    window.location.hash = "emp-panel";
-                    formCrear.reset();
-                    cargarProductos();
-                } else {
-                    const err = await response.json();
-                    mostrarAlerta("Error", err.error || "No se pudo registrar el producto.");
-                }
-            } catch (error) {
-                window.location.hash = "emp-panel";
-                mostrarAlerta("Éxito (Simulación)", "Producto registrado correctamente.");
-                formCrear.reset();
-            }
+    // Acciones de la tabla (Ver / Registrar salida) con un solo listener
+    const tbody = document.getElementById("inventory-tbody");
+    if (tbody) {
+        tbody.addEventListener("click", (e) => {
+            const boton = e.target.closest("a[data-action]");
+            if (!boton) return;
+            const fila = boton.closest("tr");
+            if (!fila) return;
+
+            if (boton.dataset.action === "ver") verProducto(fila.dataset);
+            if (boton.dataset.action === "salida") prepararSalida(fila.dataset.id);
         });
     }
 
-    // Editar Producto
-    const formEditar = document.getElementById("form-editar");
-    if (formEditar) {
-        formEditar.addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const id = document.getElementById("editar-id").value;
-            const formData = new FormData(formEditar);
-            try {
-                const response = await fetch(`/inventario/productos/${id}/`, { method: "PUT", body: formData });
-                if (response.ok) {
-                    window.location.hash = "emp-panel";
-                    cargarProductos();
-                } else {
-                    const err = await response.json();
-                    mostrarAlerta("Error", err.error || "No se pudo actualizar el producto.");
-                }
-            } catch (error) {
-                window.location.hash = "emp-panel";
-                mostrarAlerta("Éxito (Simulación)", "Cambios guardados correctamente.");
-            }
-        });
-    }
-
-    // Eliminar Producto
-    const formEliminar = document.getElementById("form-eliminar");
-    if (formEliminar) {
-        formEliminar.addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const id = document.getElementById("eliminar-id").value;
-            try {
-                const response = await fetch(`/inventario/productos/${id}/`, { method: "DELETE" });
-                if (response.ok) {
-                    window.location.hash = "emp-panel";
-                    cargarProductos();
-                } else {
-                    const err = await response.json();
-                    mostrarAlerta("Error", err.error || "No se pudo eliminar el producto.");
-                }
-            } catch (error) {
-                window.location.hash = "emp-panel";
-                mostrarAlerta("Éxito (Simulación)", "Producto eliminado del inventario.");
-            }
-        });
+    // Registrar salida
+    const formSalida = document.getElementById("form-salida");
+    if (formSalida) {
+        const selectProducto = document.getElementById("salida-producto");
+        selectProducto.addEventListener("change", () => mostrarDisponible(selectProducto.value));
+        formSalida.addEventListener("submit", registrarSalida);
     }
 });
 
-// Funciones para rellenar modales de Ver, Editar y Eliminar
-function verProducto(id, sku, nombre, desc, precio, stock, especie, categoria, marca, estatus) {
-    document.getElementById("ver-id").textContent = id;
-    document.getElementById("ver-sku").textContent = sku;
-    document.getElementById("ver-nombre").textContent = nombre;
-    document.getElementById("ver-desc").textContent = desc || "Sin descripción";
-    document.getElementById("ver-precio").textContent = `$${precio}`;
-    document.getElementById("ver-stock").textContent = stock;
-    document.getElementById("ver-especie").textContent = especie;
-    document.getElementById("ver-categoria").textContent = categoria;
-    document.getElementById("ver-marca").textContent = marca;
-    document.getElementById("ver-estatus").textContent = estatus;
+/* ---------- Actualización automática ---------- */
+function iniciarActualizacionAutomatica() {
+    setInterval(() => {
+        // No refrescar con la pestaña oculta ni mientras hay un modal abierto
+        const hayModalAbierto = window.location.hash.startsWith("#modal-")
+            || document.querySelector(".modal.is-open");
+        if (document.hidden || hayModalAbierto) return;
+        cargarProductos(ultimaConsulta, true);
+    }, INTERVALO_ACTUALIZACION_MS);
 }
 
-function prepararEdicion(id, sku, nombre, desc, precio, especie, categoria, marca) {
-    document.getElementById("editar-id").value = id;
-    document.getElementById("editar-sku").value = sku;
-    document.getElementById("editar-nombre").value = nombre;
-    document.getElementById("editar-precio").value = precio;
-    document.getElementById("editar-especie").value = especie;
-    document.getElementById("editar-categoria").value = categoria;
-    document.getElementById("editar-marca").value = marca;
-    document.getElementById("editar-desc").value = desc || "";
+function marcarActualizacion(ok) {
+    const indicador = document.getElementById("live-indicator");
+    if (!indicador) return;
+    if (ok) {
+        indicador.classList.remove("live-indicator--error");
+        indicador.textContent = `Actualizado ${new Date().toLocaleTimeString("es-MX")}`;
+    } else {
+        indicador.classList.add("live-indicator--error");
+        indicador.textContent = "Sin conexión con el servidor";
+    }
 }
 
-function prepararEliminacion(id, nombre) {
-    document.getElementById("eliminar-id").value = id;
-    document.getElementById("eliminar-nombre").textContent = nombre;
+/* ---------- Modal Ver ---------- */
+function verProducto(d) {
+    document.getElementById("ver-id").textContent = d.id;
+    document.getElementById("ver-sku").textContent = d.sku;
+    document.getElementById("ver-nombre").textContent = d.nombre;
+    document.getElementById("ver-desc").textContent = d.desc || "Sin descripción";
+    document.getElementById("ver-precio").textContent = `$${d.precio}`;
+    document.getElementById("ver-stock").textContent = d.stock;
+    document.getElementById("ver-especie").textContent = d.especie;
+    document.getElementById("ver-categoria").textContent = d.categoria;
+    document.getElementById("ver-marca").textContent = d.marca;
+    document.getElementById("ver-estatus").textContent = "Activo";
 }
 
-// Catálogos y Tabla
+/* ---------- Salidas ---------- */
+function prepararSalida(idProducto) {
+    const select = document.getElementById("salida-producto");
+    select.value = String(idProducto);
+    mostrarDisponible(select.value);
+}
+
+function stockDe(idProducto) {
+    const fila = document.querySelector(`#inventory-tbody tr[data-id="${idProducto}"]`);
+    return fila ? parseInt(fila.dataset.stock, 10) : null;
+}
+
+function mostrarDisponible(idProducto) {
+    const aviso = document.getElementById("salida-disponible");
+    const stock = idProducto ? stockDe(idProducto) : null;
+    aviso.textContent = stock === null ? "Stock disponible: —" : `Stock disponible: ${stock}`;
+}
+
+function obtenerCsrf() {
+    const m = document.cookie.match(/(?:^|;\s*)csrftoken=([^;]+)/);
+    return m ? decodeURIComponent(m[1]) : "";
+}
+
+async function registrarSalida(e) {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const idProducto = document.getElementById("salida-producto").value;
+    const cantidad = parseInt(document.getElementById("salida-cantidad").value, 10);
+    const disponible = stockDe(idProducto);
+
+    // Validación rápida en pantalla; el servidor sigue siendo quien decide
+    if (disponible !== null && cantidad > disponible) {
+        mostrarAlerta("Stock insuficiente", `Solo hay ${disponible} pieza(s) disponibles.`);
+        return;
+    }
+
+    try {
+        const response = await fetch("/inventario/salidas/", {
+            method: "POST",
+            body: new FormData(form),
+            headers: { "X-CSRFToken": obtenerCsrf() }
+        });
+
+        if (response.ok) {
+            window.location.hash = "emp-panel";
+            form.reset();
+            mostrarDisponible("");
+            await cargarProductos(ultimaConsulta);
+            mostrarAlerta("Salida registrada", "La salida se registró y el stock se actualizó.");
+        } else {
+            const data = await response.json();
+            const titulo = response.status === 409 ? "Conflicto de stock" : "Error";
+            mostrarAlerta(titulo, data.error || "No se pudo registrar la salida.");
+        }
+    } catch (error) {
+        // Modo estático (sin backend): se simula el descuento en pantalla
+        const fila = document.querySelector(`#inventory-tbody tr[data-id="${idProducto}"]`);
+        if (fila) {
+            const nuevo = (disponible || 0) - cantidad;
+            fila.dataset.stock = nuevo;
+            const span = document.getElementById(`stock-val-${idProducto}`);
+            if (span) span.textContent = nuevo;
+        }
+        window.location.hash = "emp-panel";
+        form.reset();
+        mostrarDisponible("");
+        mostrarAlerta("Éxito (Simulación)", "Salida registrada correctamente.");
+    }
+}
+
+/* ---------- Catálogos y tabla ---------- */
 async function cargarCatalogos() {
     try {
         const response = await fetch("/inventario/catalogos/");
@@ -144,15 +182,24 @@ function poblarSelect(elementId, items = [], defaultText) {
     });
 }
 
-async function cargarProductos(queryString = "") {
+async function cargarProductos(queryString = "", silencioso = false) {
+    ultimaConsulta = queryString;
     try {
         const response = await fetch(`/inventario/productos/${queryString}`);
         if (!response.ok) throw new Error();
         const productos = await response.json();
         renderizarTabla(productos);
+        marcarActualizacion(true);
     } catch (e) {
-        console.warn("Modo estático de productos activo.");
+        if (!silencioso) console.warn("Modo estático de productos activo.");
+        marcarActualizacion(false);
     }
+}
+
+function esc(valor) {
+    return String(valor ?? "").replace(/[&<>"']/g, c => (
+        { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]
+    ));
 }
 
 function renderizarTabla(productos) {
@@ -165,65 +212,49 @@ function renderizarTabla(productos) {
 
     productos.forEach(prod => {
         const tr = document.createElement("tr");
+        tr.dataset.id = prod.id_producto;
+        tr.dataset.sku = prod.codigo_sku;
+        tr.dataset.nombre = prod.nombre_producto;
+        tr.dataset.desc = prod.descripcion_producto || "";
+        tr.dataset.precio = prod.precio_publico;
+        tr.dataset.stock = prod.stock_actual;
+        tr.dataset.especie = prod.especie || "N/D";
+        tr.dataset.categoria = prod.categoria || "N/D";
+        tr.dataset.marca = prod.marca || "N/D";
+
         tr.innerHTML = `
-            <td data-label="SKU"><strong>${prod.codigo_sku}</strong></td>
-            <td data-label="Producto">${prod.nombre_producto}</td>
-            <td data-label="Especie">${prod.especie || 'N/D'}</td>
-            <td data-label="Categoría">${prod.categoria || 'N/D'}</td>
-            <td data-label="Marca">${prod.marca || 'N/D'}</td>
-            <td data-label="Precio">$${prod.precio_publico}</td>
-            <td data-label="Stock Actual"><span id="stock-val-${prod.id_producto}" style="font-weight:700;">${prod.stock_actual}</span></td>
-            <td data-label="Control Stock">
-                <div class="stock-control">
-                    <button type="button" class="btn btn--stock btn--stock-minus" onclick="modificarStock(${prod.id_producto}, 'restar')" title="Restar 1">-</button>
-                    <span class="stock-control__value" id="stock-num-${prod.id_producto}">${prod.stock_actual}</span>
-                    <button type="button" class="btn btn--stock btn--stock-plus" onclick="modificarStock(${prod.id_producto}, 'sumar')" title="Sumar 1">+</button>
-                </div>
-            </td>
+            <td data-label="SKU"><strong>${esc(prod.codigo_sku)}</strong></td>
+            <td data-label="Producto">${esc(prod.nombre_producto)}</td>
+            <td data-label="Especie">${esc(prod.especie || "N/D")}</td>
+            <td data-label="Categoría">${esc(prod.categoria || "N/D")}</td>
+            <td data-label="Marca">${esc(prod.marca || "N/D")}</td>
+            <td data-label="Precio">$${esc(prod.precio_publico)}</td>
+            <td data-label="Stock Actual"><span id="stock-val-${esc(prod.id_producto)}" style="font-weight:700;">${esc(prod.stock_actual)}</span></td>
             <td data-label="Acciones" class="data-table__actions">
-                <a href="#modal-ver" class="btn btn--small btn--ghost" onclick="verProducto(${prod.id_producto}, '${prod.codigo_sku}', '${prod.nombre_producto}', '${prod.descripcion_producto || ''}', '${prod.precio_publico}', '${prod.stock_actual}', '${prod.especie}', '${prod.categoria}', '${prod.marca}', 'Activo')">Ver</a>
-                <a href="#modal-editar" class="btn btn--small btn--secondary" onclick="prepararEdicion(${prod.id_producto}, '${prod.codigo_sku}', '${prod.nombre_producto}', '${prod.descripcion_producto || ''}', '${prod.precio_publico}', '${prod.especie}', '${prod.categoria}', '${prod.marca}')">Editar</a>
-                <a href="#modal-eliminar" class="btn btn--small btn--danger" onclick="prepararEliminacion(${prod.id_producto}, '${prod.nombre_producto}')">Eliminar</a>
+                <a href="#modal-ver" class="btn btn--small btn--ghost" data-action="ver">Ver</a>
+                <a href="#modal-salida" class="btn btn--small btn--secondary" data-action="salida">Registrar salida</a>
             </td>
         `;
         tbody.appendChild(tr);
     });
+
+    sincronizarSelectSalida(productos);
 }
 
-async function modificarStock(idProducto, operacion) {
-    try {
-        const formData = new FormData();
-        formData.append("operacion", operacion);
-        formData.append("cantidad", "1");
-
-        const response = await fetch(`/inventario/productos/${idProducto}/stock/`, { method: "POST", body: formData });
-        const data = await response.json();
-
-        if (response.ok) {
-            const nuevoStock = data.producto.stock_actual;
-            document.getElementById(`stock-val-${idProducto}`).textContent = nuevoStock;
-            document.getElementById(`stock-num-${idProducto}`).textContent = nuevoStock;
-        } else if (response.status === 409) {
-            mostrarAlerta("Conflicto de Stock", data.error || "No se pudo completar la operación.");
-        } else {
-            mostrarAlerta("Aviso", data.error || data.mensaje || "Error al actualizar stock.");
-        }
-    } catch (error) {
-        const spanNum = document.getElementById(`stock-num-${idProducto}`);
-        const spanVal = document.getElementById(`stock-val-${idProducto}`);
-        if (!spanNum) return;
-        let actual = parseInt(spanNum.textContent);
-        
-        if (operacion === 'sumar') actual += 1;
-        else if (operacion === 'restar' && actual > 0) actual -= 1;
-        else if (operacion === 'restar' && actual <= 0) {
-            mostrarAlerta("Stock Insuficiente", "El stock actual es 0 y no se puede reducir más.");
-            return;
-        }
-
-        spanNum.textContent = actual;
-        spanVal.textContent = actual;
-    }
+// Mantiene el select del modal de salida igual a los productos de la tabla
+function sincronizarSelectSalida(productos) {
+    const select = document.getElementById("salida-producto");
+    if (!select) return;
+    const seleccionado = select.value;
+    select.innerHTML = '<option value="">Seleccionar…</option>';
+    productos.forEach(p => {
+        const opt = document.createElement("option");
+        opt.value = p.id_producto;
+        opt.textContent = `${p.codigo_sku} · ${p.nombre_producto}`;
+        select.appendChild(opt);
+    });
+    select.value = seleccionado;
+    mostrarDisponible(select.value);
 }
 
 function mostrarAlerta(titulo, mensaje) {

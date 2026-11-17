@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de Administrador | Reportes recibidos</title>
+  <link rel="stylesheet" href="admin-panel.css">
+  <link rel="stylesheet" href="panel-extras.css">
+</head>
+<body>
+
+  <!-- ===================== PANEL PRINCIPAL ===================== -->
+  <main class="admin-panel" id="admin-panel">
+
+    <!-- Navegación entre paneles del rol -->
+    <nav class="panel-nav" aria-label="Paneles del administrador">
+      <a href="admin-panel.html" class="panel-nav__link">Empleados y credenciales</a>
+      <a href="admin-reportes.html" class="panel-nav__link panel-nav__link--current" aria-current="page">Reportes recibidos</a>
+    </nav>
+
+    <header class="admin-panel__header">
+      <div>
+        <h1>Reportes recibidos</h1>
+        <p class="admin-panel__subtitle">Solicitudes del gerente · Acceso exclusivo para el rol <strong>Administrador</strong></p>
+      </div>
+      <span class="badge badge--role">Rol: Administrador</span>
+    </header>
+
+    <!-- Resumen -->
+    <section class="summary" aria-label="Resumen de reportes">
+      <article class="summary__card summary__card--warning">
+        <p class="summary__label">Pendientes</p>
+        <p class="summary__value" id="resumen-pendientes">2</p>
+        <p class="summary__hint">Requieren atención</p>
+      </article>
+      <article class="summary__card summary__card--success">
+        <p class="summary__label">Atendidos</p>
+        <p class="summary__value" id="resumen-atendidos">1</p>
+        <p class="summary__hint">Cerrados por el administrador</p>
+      </article>
+      <article class="summary__card">
+        <p class="summary__label">Total recibidos</p>
+        <p class="summary__value" id="resumen-total">3</p>
+        <p class="summary__hint">Histórico</p>
+      </article>
+    </section>
+
+    <!-- Barra de búsqueda y filtros -->
+    <section class="toolbar" aria-label="Filtros">
+      <input type="search" id="buscar" class="toolbar__search" placeholder="Buscar por gerente, asunto o empleado…" aria-label="Buscar reportes">
+      <select id="filtro-tipo" class="toolbar__select" aria-label="Filtrar por tipo">
+        <option value="">Todos los tipos</option>
+        <option value="datos_empleado">Corrección de datos de un empleado</option>
+        <option value="datos_propios">Corrección de datos propios</option>
+        <option value="cambio_password">Cambio de contraseña</option>
+      </select>
+      <select id="filtro-estatus" class="toolbar__select" aria-label="Filtrar por estatus">
+        <option value="">Todos los estatus</option>
+        <option value="pendiente">Pendiente</option>
+        <option value="atendido">Atendido</option>
+      </select>
+    </section>
+
+    <!-- ===================== TABLA DE REPORTES ===================== -->
+    <div class="table-wrapper">
+      <table class="data-table" id="tabla-reportes">
+        <caption class="sr-only">Reportes recibidos del gerente</caption>
+        <thead>
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Fecha</th>
+            <th scope="col">Gerente</th>
+            <th scope="col">Tipo</th>
+            <th scope="col">Asunto</th>
+            <th scope="col">Estatus</th>
+            <th scope="col" class="data-table__actions-col">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td data-label="ID">003</td>
+            <td data-label="Fecha">16/11/2026 10:42</td>
+            <td data-label="Gerente">Laura Méndez</td>
+            <td data-label="Tipo"><span class="badge badge--info">Cambio de contraseña</span></td>
+            <td data-label="Asunto">Solicito restablecer mi contraseña</td>
+            <td data-label="Estatus"><span class="badge badge--warning">Pendiente</span></td>
+            <td data-label="Acciones" class="data-table__actions">
+              <a href="#modal-ver" class="btn btn--small btn--ghost">Ver</a>
+              <a href="#modal-atender" class="btn btn--small btn--success">Marcar atendido</a>
+            </td>
+          </tr>
+          <tr>
+            <td data-label="ID">002</td>
+            <td data-label="Fecha">15/11/2026 16:05</td>
+            <td data-label="Gerente">Laura Méndez</td>
+            <td data-label="Tipo"><span class="badge badge--role">Datos de un empleado</span></td>
+            <td data-label="Asunto">Correo mal escrito de Carlos Ramírez</td>
+            <td data-label="Estatus"><span class="badge badge--warning">Pendiente</span></td>
+            <td data-label="Acciones" class="data-table__actions">
+              <a href="#modal-ver" class="btn btn--small btn--ghost">Ver</a>
+              <a href="#modal-atender" class="btn btn--small btn--success">Marcar atendido</a>
+            </td>
+          </tr>
+          <tr>
+            <td data-label="ID">001</td>
+            <td data-label="Fecha">13/11/2026 09:15</td>
+            <td data-label="Gerente">Laura Méndez</td>
+            <td data-label="Tipo"><span class="badge badge--role">Datos propios</span></td>
+            <td data-label="Asunto">Actualizar mi teléfono de contacto</td>
+            <td data-label="Estatus"><span class="badge badge--success">Atendido</span></td>
+            <td data-label="Acciones" class="data-table__actions">
+              <a href="#modal-ver" class="btn btn--small btn--ghost">Ver</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <footer class="admin-panel__footer">
+      <span>Mostrando 3 de 3 reportes</span>
+      <nav class="pagination" aria-label="Paginación">
+        <a href="#" class="pagination__link pagination__link--disabled">‹ Anterior</a>
+        <a href="#" class="pagination__link pagination__link--current">1</a>
+        <a href="#" class="pagination__link pagination__link--disabled">Siguiente ›</a>
+      </nav>
+    </footer>
+  </main>
+
+  <!-- ===================== MODALES (OCULTOS) =====================
+       Se muestran con :target (sin JavaScript). Para cerrarlos,
+       el enlace apunta a "#admin-panel". -->
+
+  <!-- MODAL: Ver reporte -->
+  <div class="modal" id="modal-ver" role="dialog" aria-modal="true" aria-labelledby="titulo-ver">
+    <a href="#admin-panel" class="modal__overlay" aria-label="Cerrar"></a>
+    <div class="modal__content">
+      <header class="modal__header">
+        <h2 id="titulo-ver">Detalle del reporte</h2>
+        <a href="#admin-panel" class="modal__close" aria-label="Cerrar">×</a>
+      </header>
+      <dl class="detail">
+        <div><dt>ID</dt><dd id="ver-id">—</dd></div>
+        <div><dt>Fecha de envío</dt><dd id="ver-fecha">—</dd></div>
+        <div><dt>Enviado por</dt><dd id="ver-gerente">—</dd></div>
+        <div><dt>Tipo</dt><dd id="ver-tipo">—</dd></div>
+        <div><dt>Empleado afectado</dt><dd id="ver-empleado">—</dd></div>
+        <div><dt>Asunto</dt><dd id="ver-asunto">—</dd></div>
+        <div><dt>Descripción</dt><dd id="ver-descripcion">—</dd></div>
+        <div><dt>Estatus</dt><dd id="ver-estatus">—</dd></div>
+        <div><dt>Atendido por</dt><dd id="ver-atendido-por">—</dd></div>
+        <div><dt>Nota de atención</dt><dd id="ver-nota">—</dd></div>
+      </dl>
+      <footer class="modal__footer">
+        <a href="#admin-panel" class="btn btn--primary">Cerrar</a>
+      </footer>
+    </div>
+  </div>
+
+  <!-- MODAL: Marcar como atendido -->
+  <div class="modal modal--small" id="modal-atender" role="dialog" aria-modal="true" aria-labelledby="titulo-atender">
+    <a href="#admin-panel" class="modal__overlay" aria-label="Cerrar"></a>
+    <div class="modal__content">
+      <header class="modal__header">
+        <h2 id="titulo-atender">Marcar como atendido</h2>
+        <a href="#admin-panel" class="modal__close" aria-label="Cerrar">×</a>
+      </header>
+      <p class="modal__text">
+        Vas a marcar como atendido el reporte <strong id="atender-asunto">seleccionado</strong>.
+        Realiza primero el cambio solicitado en el panel de <a href="admin-panel.html">Empleados y credenciales</a>.
+      </p>
+      <form class="form" id="form-atender" action="#" method="post">
+        <input type="hidden" id="atender-id" name="id_reporte">
+        <div class="form__group">
+          <label for="atender-nota">Nota de atención (opcional)</label>
+          <textarea id="atender-nota" name="nota_atencion" rows="3" placeholder="Ej. Se corrigió el correo del empleado."></textarea>
+        </div>
+        <footer class="modal__footer">
+          <a href="#admin-panel" class="btn btn--ghost">Cancelar</a>
+          <button type="submit" class="btn btn--success-solid">Marcar atendido</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+</body>
+</html>
