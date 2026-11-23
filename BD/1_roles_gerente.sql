@@ -10,5 +10,5 @@ INSERT IGNORE INTO roles_usuario (nombre_rol, descripcion_rol) VALUES
 INSERT IGNORE INTO roles_usuario (nombre_rol, descripcion_rol) VALUES
 ('Gerente',       'Compras, proveedores, personal, cortes de caja y reportes');
 
--- Consulta de verificación (debe devolver exactamente 3 filas)
+-- verificar que salen
 SELECT id_rol, nombre_rol, descripcion_rol FROM roles_usuario ORDER BY id_rol;
