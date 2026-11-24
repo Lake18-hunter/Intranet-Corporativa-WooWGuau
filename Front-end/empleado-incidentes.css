@@ -1,0 +1,350 @@
+/* =====================================================
+   WooWGuau · Panel de Empleado · Reporte de incidentes
+   Estilos propios del formulario de incidentes.
+   Se carga DESPUÉS de inventario-empleado.css y panel-extras.css,
+   y reutiliza sus mismos colores (variables :root).
+   ===================================================== */
+
+:root {
+  --color-danger-soft: #fef2f2;
+  --color-focus: rgba(37, 99, 235, .2);
+}
+
+/* ---------- Foco visible para teclado ---------- */
+a:focus-visible,
+button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-focus);
+}
+
+/* ---------- Tarjeta del formulario ---------- */
+.form-card {
+  padding: 24px;
+  margin-bottom: 32px;
+}
+
+.form-card__intro { margin-bottom: 20px; }
+
+.form__grid { gap: 16px; }
+
+.form__optional {
+  color: var(--color-muted);
+  font-weight: 400;
+  font-size: .8rem;
+}
+
+.form__group input,
+.form__group select,
+.form__group textarea {
+  color: var(--color-text);
+  transition: border-color .15s, box-shadow .15s;
+}
+
+.form__group input::placeholder,
+.form__group textarea::placeholder { color: #9ca3af; }
+
+/* "Reportado por": solo informativo */
+#inc-reporta {
+  background: var(--color-bg);
+  color: var(--color-muted);
+  cursor: default;
+}
+
+.form__group textarea {
+  min-height: 110px;
+  line-height: 1.5;
+}
+
+/* Error y contador en la misma línea bajo la descripción */
+.form__meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.form__counter {
+  margin-left: auto;
+  color: var(--color-muted);
+  font-size: .75rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.form__counter--limite { color: #b45309; font-weight: 600; }
+
+.form__actions {
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+}
+
+/* Botón bloqueado mientras se envía */
+.btn:disabled {
+  opacity: .6;
+  cursor: wait;
+  transform: none;
+}
+
+/* ---------- Errores de validación ---------- */
+.form__group input[aria-invalid="true"],
+.form__group select[aria-invalid="true"],
+.form__group textarea[aria-invalid="true"] {
+  border-color: var(--color-danger);
+  background: #fffafa;
+}
+
+.form__group input[aria-invalid="true"]:focus,
+.form__group select[aria-invalid="true"]:focus,
+.form__group textarea[aria-invalid="true"]:focus {
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, .15);
+}
+
+.form__error {
+  color: var(--color-danger);
+  font-size: .78rem;
+  font-weight: 500;
+}
+
+.form__error:empty { display: none; }
+
+/* Error general (servidor o conexión), arriba del formulario */
+.form__error--general {
+  display: block;
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  background: var(--color-danger-soft);
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  font-size: .85rem;
+}
+
+.form__error--general:empty { display: none; }
+
+/* ---------- Encabezado del historial ---------- */
+.incidentes__encabezado {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.incidentes__encabezado .subsection-title { margin: 0; scroll-margin-top: 24px; }
+.incidentes__encabezado .toolbar__select { min-width: 180px; cursor: pointer; }
+
+/* ---------- Tabla de mis incidentes ---------- */
+.data-table tbody td:first-child {
+  color: var(--color-muted);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.data-table td[data-label="Fecha"] {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.data-table__empty {
+  margin: 0;
+  padding: 40px 16px;
+  text-align: center;
+  color: var(--color-muted);
+  font-size: .9rem;
+}
+
+/* El incidente recién enviado se resalta unos segundos */
+.data-table tbody tr.fila--nueva td {
+  animation: fila-nueva 2.5s ease-out;
+}
+
+@keyframes fila-nueva {
+  from { background: var(--color-role-bg); }
+  to   { background: transparent; }
+}
+
+/* ---------- Modal de detalle ---------- */
+.modal__footer {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+}
+
+.detail > div:last-child { border-bottom: none; }
+.detail dd { word-break: break-word; }
+
+/* La descripción ocupa todo el ancho, debajo de su título */
+.detail > .detail__bloque {
+  flex-direction: column;
+  gap: 6px;
+}
+
+.detail__bloque dd {
+  text-align: left;
+  padding: 10px 12px;
+  background: var(--color-bg);
+  border-radius: 8px;
+  white-space: pre-line;
+}
+
+/* ---------- Modal de confirmación ---------- */
+.confirmacion { text-align: center; padding-top: 32px; }
+
+.confirmacion__icono {
+  display: grid;
+  place-items: center;
+  width: 56px; height: 56px;
+  margin: 0 auto 14px;
+  border-radius: 50%;
+  background: var(--color-success-bg);
+  color: var(--color-success);
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.confirmacion__titulo { margin: 0 0 8px; font-size: 1.25rem; }
+
+.confirmacion__texto {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: .92rem;
+  line-height: 1.6;
+}
+
+.confirmacion__texto strong { color: var(--color-text); }
+.confirmacion__texto .badge { vertical-align: middle; }
+
+.confirmacion__acciones { justify-content: center; }
+
+/* ---------- Aviso flotante ---------- */
+.aviso {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 1100;
+  max-width: calc(100% - 48px);
+  padding: 12px 18px;
+  border-radius: 10px;
+  font-size: .9rem;
+  font-weight: 600;
+  box-shadow: var(--shadow);
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+  transition: opacity .2s, transform .2s;
+}
+
+.aviso--visible { opacity: 1; transform: none; }
+.aviso--ok { background: var(--color-success-bg); color: var(--color-success); border: 1px solid #bbf7d0; }
+.aviso--error { background: var(--color-danger-soft); color: var(--color-danger-dark); border: 1px solid #fecaca; }
+
+/* ---------- Movimiento reducido ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .data-table tbody tr.fila--nueva td { animation: none; }
+  .aviso, .form__group input, .form__group select, .form__group textarea { transition: none; }
+}
+
+/* ---------- Celular ---------- */
+@media (max-width: 720px) {
+  .form-card { padding: 16px; }
+
+  .form__actions { flex-direction: column-reverse; }
+  .form__actions .btn { width: 100%; text-align: center; }
+
+  .incidentes__encabezado .toolbar__select { flex: 1 1 100%; }
+
+  /* Los modales suben desde abajo */
+  .modal { padding: 0; align-items: flex-end; }
+  .modal__content { max-height: 92vh; border-radius: 16px 16px 0 0; }
+  .modal__footer .btn { flex: 1; text-align: center; }
+
+  .data-table tbody td::before { margin-right: auto; }
+  .data-table td[data-label="Fecha"] { white-space: normal; }
+
+  .aviso { right: 16px; bottom: 16px; left: 16px; max-width: none; }
+  
+}
+
+/* =====================================================
+   PANTALLAS: Reportar incidente / Mis incidentes
+   ===================================================== */
+.vista[hidden] { display: none; }
+
+.vista { animation: vista-entrar .2s ease-out; }
+
+@keyframes vista-entrar {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Número de incidentes en espera dentro del menú */
+.panel-nav__link { display: inline-flex; align-items: center; gap: 6px; }
+
+.panel-nav__contador {
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--color-warning-bg);
+  color: var(--color-warning-text);
+  font-size: .72rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.panel-nav__contador[hidden] { display: none; }
+
+.panel-nav__link--current .panel-nav__contador {
+  background: rgba(255, 255, 255, .25);
+  color: #fff;
+}
+
+/* Tarjetas de resumen en "Mis incidentes" */
+.resumen-incidentes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.resumen-incidentes__tarjeta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px 16px;
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.resumen-incidentes__tarjeta--enviado  { border-left-color: #f59e0b; }
+.resumen-incidentes__tarjeta--revisado { border-left-color: #16a34a; }
+
+.resumen-incidentes__etiqueta {
+  color: var(--color-muted);
+  font-size: .75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.resumen-incidentes__valor {
+  font-size: 1.6rem;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vista { animation: none; }
+}
+
+@media (max-width: 720px) {
+  .resumen-incidentes { grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .resumen-incidentes__tarjeta { padding: 10px 12px; }
+  .resumen-incidentes__etiqueta { font-size: .68rem; }
+  .resumen-incidentes__valor { font-size: 1.3rem; }
+}
