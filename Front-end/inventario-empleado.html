@@ -13,7 +13,8 @@
         <!-- Navegación entre paneles del rol -->
         <nav class="panel-nav" aria-label="Paneles del empleado">
             <a href="inventario-empleado.html" class="panel-nav__link panel-nav__link--current" aria-current="page">Inventario y salidas</a>
-            <a href="empleado-incidentes.html" class="panel-nav__link">Incidentes</a>
+                        <a href="empleado-incidentes.html" class="panel-nav__link">Reportar incidente</a>
+            <a href="empleado-incidentes.html?vista=mis" class="panel-nav__link">Mis incidentes</a>
         </nav>
 
         <header class="emp-panel__header">
@@ -24,6 +25,7 @@
             <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
                 <span class="live-indicator" id="live-indicator" role="status" aria-live="polite">Actualizando…</span>
                 <span class="badge badge--role">Rol: Empleado</span>
+                <a href="empleado-incidentes.html" class="btn btn--secondary">Reportar incidente</a>
                 <a href="#modal-salida" class="btn btn--primary">+ Registrar salida</a>
             </div>
         </header>
