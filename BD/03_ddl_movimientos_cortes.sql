@@ -1,13 +1,14 @@
 USE woowguau_db;
 
--- Se agrego costo_unitario y stock_minimo a inventario_productos
+-- costo_unitario, stock_minimo y fecha_caducidad a inventario_productos
 ALTER TABLE inventario_productos
     ADD COLUMN costo_unitario DECIMAL(10,2) NOT NULL DEFAULT 0.00 AFTER precio_publico,
     ADD COLUMN stock_minimo INT NOT NULL DEFAULT 5 AFTER stock_actual,
+    ADD COLUMN fecha_caducidad DATE NULL AFTER stock_minimo,
     ADD CONSTRAINT chk_costo_unitario_producto CHECK (costo_unitario >= 0),
     ADD CONSTRAINT chk_stock_minimo_producto CHECK (stock_minimo >= 0);
 
--- Nueva TABLA: Movimientos de inventario
+--  Movimientos de inventario
 CREATE TABLE movimientos_inventario (
     id_movimiento INT AUTO_INCREMENT PRIMARY KEY,
     id_producto INT NOT NULL,
@@ -37,7 +38,7 @@ CREATE TABLE movimientos_inventario (
     INDEX idx_movimientos_fecha_tipo (fecha_alta, tipo_movimiento)
 ) ENGINE=InnoDB;
 
--- Nueva TABLA: Cortes de caja
+-- Cortes de caja
 CREATE TABLE cortes_caja (
     id_corte INT AUTO_INCREMENT PRIMARY KEY,
     fecha_corte DATE NOT NULL UNIQUE,
