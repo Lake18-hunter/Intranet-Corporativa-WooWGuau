@@ -10,6 +10,8 @@ from .models import UsuarioSistema
 # Ajusta estos nombres si BD usó otros en la tabla roles_usuario (se compara en minúsculas)
 ROLES_ADMIN = {"administrador", "admin"}
 ROLES_EMPLEADO = {"empleado"}
+ROLES_GERENTE = {"gerente"}
+DESTINOS = {"admin": "panel_admin", "gerente": "panel_gerente", "empleado": "panel_empleado"}
 
 
 def _tipo_de_rol(nombre_rol):
@@ -18,6 +20,8 @@ def _tipo_de_rol(nombre_rol):
         return "admin"
     if nombre in ROLES_EMPLEADO:
         return "empleado"
+    if nombre in ROLES_GERENTE:
+        return "gerente"
     return None
 
 
@@ -64,8 +68,7 @@ def login_view(request):
     request.session["rol"] = tipo   # "admin" o "empleado"
 
     # 8. Redirigir según el rol
-    return redirect("panel_admin" if tipo == "admin" else "panel_empleado")
-
+    return redirect(DESTINOS[tipo])
 
 def logout_view(request):
     request.session.flush()
@@ -81,4 +84,9 @@ def panel_admin(request):
 @rol_requerido("empleado")
 def panel_empleado(request):
     return render(request, "usuarios/panel_empleado.html",
+                  {"nombre": request.session.get("nombre_usuario")})
+@ensure_csrf_cookie
+@rol_requerido("gerente")
+def panel_gerente(request):
+    return render(request, "usuarios/panel_gerente.html",
                   {"nombre": request.session.get("nombre_usuario")})

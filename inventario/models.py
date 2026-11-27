@@ -39,7 +39,24 @@ class Producto(models.Model):
     categoria = models.ForeignKey(CategoriaProducto, on_delete=models.PROTECT, db_column="id_categoria")
     marca = models.ForeignKey(MarcaComercial, on_delete=models.PROTECT, db_column="id_marca")
     estatus_producto = models.BooleanField(default=True)   # 1 activo, 0 descontinuado
+    costo_unitario = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    stock_minimo = models.IntegerField(default=5)
 
     class Meta:
         managed = False
         db_table = "inventario_productos"
+
+class MovimientoInventario(models.Model):
+    COMPRA = "compra"
+    VENTA = "venta"
+    MERMA = "merma"
+    USO_INTERNO = "Uso Interno"   # así lo definió BD en el ENUM: con espacio y mayúsculas
+    TIPOS = (COMPRA, VENTA, MERMA, USO_INTERNO)
+
+    # ... el resto de los campos queda igual ...
+    tipo_movimiento = models.CharField(max_length=11)
+
+    class Meta:
+        managed = False
+        db_table = "movimientos_inventario"
+    
