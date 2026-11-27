@@ -1,0 +1,218 @@
+1. CONFIGURACIÓN DE LA BASE DE DATOS
+
+Motor de BD: MySQL Server 8.0 (InnoDB)
+Juego de caracteres: utf8mb4_spanish_ci
+
+Por qué se configuró así:
+* Motor InnoDB: Soporta llaves foráneas (FOREIGN KEY) y transacciones seguras para que no se corrompan los datos.
+* Cotejamiento utf8mb4_spanish_ci: Acepta acentos y ñ sin problemas y no distingue entre mayúsculas y minúsculas al buscar.
+* Normalización en 3FN: Separa los catálogos (tipos_especie, categorias_producto, marcas_comerciales) de las tablas donde se mueven los datos del día a día.
+* Lista para Azure: Es 100% compatible con Microsoft Azure Database for MySQL.
+
+
+2. DICCIONARIO DE DATOS (17 TABLAS)
+
+--- SEGURIDAD Y EXPEDIENTES ---
+
+TABLA: roles_usuario
+- id_rol (INT, NOT NULL, PK, AUTO_INCREMENT): Identificador único del rol.
+- nombre_rol (VARCHAR(30), NOT NULL, UNIQUE): Nombre del rol ('Administrador', 'Gerente', 'Empleado').
+- descripcion_rol (VARCHAR(150), NULL): Descripción de los permisos.
+- fecha_registro (DATETIME, DEFAULT CURRENT_TIMESTAMP): Fecha de creación.
+
+TABLA: usuarios_sistema
+- id_usuario (INT, NOT NULL, PK, AUTO_INCREMENT): Identificador único de usuario.
+- nombre_usuario (VARCHAR(50), NOT NULL, UNIQUE): Nombre para iniciar sesión.
+- correo (VARCHAR(100), NOT NULL, UNIQUE): Correo de contacto (cuentas Gmail).
+- hash_contrasena (VARCHAR(255), NOT NULL): Clave de acceso encriptada (hash).
+- id_rol (INT, NOT NULL, FK -> roles_usuario): Rol asignado.
+- estatus_cuenta (TINYINT(1), DEFAULT 1): Estado (1 = Activa, 0 = Inactiva).
+- fecha_ultimo_acceso (DATETIME, NULL): Última vez que entró al sistema.
+- fecha_alta (DATETIME, DEFAULT CURRENT_TIMESTAMP): Fecha de alta.
+- fecha_modificacion (DATETIME, DEFAULT CURRENT_TIMESTAMP ON UPDATE): Última modificación.
+
+TABLA: expediente_empleados
+- id_empleado (INT, NOT NULL, PK, AUTO_INCREMENT): Identificador del expediente.
+- id_usuario (INT, NULL, FK -> usuarios_sistema, UNIQUE): Enlace a su cuenta de acceso (puede quedar vacío si aún no tiene usuario).
+- numero_empleado (VARCHAR(15), NOT NULL, UNIQUE): Código interno del trabajador.
+- nombre_empleado (VARCHAR(50), NOT NULL): Nombre(s) del trabajador.
+- apellido_paterno (VARCHAR(50), NOT NULL): Apellido paterno.
+- apellido_materno (VARCHAR(50), NULL): Apellido materno.
+- telefono_contacto (VARCHAR(15), NULL): Teléfono de contacto.
+- puesto_trabajo (VARCHAR(50), NOT NULL): Puesto en la tienda.
+- fecha_ingreso (DATE, NOT NULL): Fecha de contratación.
+- estatus_laboral (ENUM('Activo', 'Inactivo', 'Baja Logica'), DEFAULT 'Activo'): Estado laboral.
+- fecha_alta (DATETIME, DEFAULT CURRENT_TIMESTAMP): Fecha de registro.
+- fecha_modificacion (DATETIME, DEFAULT CURRENT_TIMESTAMP ON UPDATE): Última actualización.
+
+
+--- CATÁLOGOS E INVENTARIO ---
+
+TABLA: tipos_especie
+- id_especie (INT, NOT NULL, PK, AUTO_INCREMENT): Identificador de la especie.
+- nombre_especie (VARCHAR(30), NOT NULL, UNIQUE): Nombre ('Perro', 'Gato', 'Multiespecie').
+
+TABLA: categorias_producto
+- id_categoria (INT, NOT NULL, PK, AUTO_INCREMENT): Identificador de la categoría.
+- nombre_categoria (VARCHAR(50), NOT NULL, UNIQUE): Nombre ('Alimento Seco', 'Accesorios', etc.).
+- descripcion_categoria (VARCHAR(150), NULL): Descripción de la línea.
+
+TABLA: marcas_comerciales
+- id_marca (INT, NOT NULL, PK, AUTO_INCREMENT): Identificador de la marca.
+- nombre_marca (VARCHAR(50), NOT NULL, UNIQUE): Nombre comercial de la marca.
+
+TABLA: inventario_productos
+- id_producto (INT, NOT NULL, PK, AUTO_INCREMENT): Identificador del producto.
+- codigo_sku (VARCHAR(30), NOT NULL, UNIQUE): Código SKU único.
+- nombre_producto (VARCHAR(100), NOT NULL): Nombre comercial del producto.
+- descripcion_producto (TEXT, NULL): Descripción detallada.
+- precio_publico (DECIMAL(10,2), NOT NULL, CHECK >= 0): Precio de venta al cliente.
+- costo_unitario (DECIMAL(10,2), NOT NULL, DEFAULT 0.00, CHECK >= 0): Último costo al que se compró el producto.
+- stock_actual (INT, NOT NULL, DEFAULT 0, CHECK >= 0): Cantidad física en tienda.
+- stock_minimo (INT, NOT NULL, DEFAULT 5, CHECK >= 0): Mínimo de piezas antes de marcar alerta de stock bajo.
+- fecha_caducidad (DATE, NULL): Fecha de caducidad para alimentos/premios (va en NULL para juguetes o accesorios).
+- id_especie (INT, NOT NULL, FK -> tipos_especie): Referencia a especie.
+- id_categoria (INT, NOT NULL, FK -> categorias_producto): Referencia a categoría.
+- id_marca (INT, NOT NULL, FK -> marcas_comerciales): Referencia a marca.
+- estatus_producto (TINYINT(1), DEFAULT 1): Estado (1 = Activo, 0 = Inactivo).
+- fecha_alta (DATETIME, DEFAULT CURRENT_TIMESTAMP): Fecha de registro.
+- fecha_modificacion (DATETIME, DEFAULT CURRENT_TIMESTAMP ON UPDATE): Última actualización.
+
+
+--- COMPRAS Y PROVEEDORES ---
+
+TABLA: proveedores
+- id_proveedor (INT, NOT NULL, PK, AUTO_INCREMENT): Identificador del proveedor.
+- nombre_proveedor (VARCHAR(120), NOT NULL): Nombre o razón social.
+- rfc (VARCHAR(13), NOT NULL, UNIQUE): RFC (12 o 13 caracteres).
+- nombre_contacto (VARCHAR(100), NULL): Persona de contacto.
+- telefono (VARCHAR(20), NULL): Teléfono del proveedor.
+- correo (VARCHAR(100), NULL): Correo para mandar pedidos.
+- direccion (VARCHAR(255), NULL): Dirección del proveedor.
+- estatus_proveedor (TINYINT(1), NOT NULL, DEFAULT 1): Estado (1 = Activo, 0 = Inactivo).
+- fecha_alta (DATETIME, DEFAULT CURRENT_TIMESTAMP): Fecha de registro.
+- fecha_modificacion (DATETIME, DEFAULT CURRENT_TIMESTAMP ON UPDATE): Última actualización.
+
+TABLA: ordenes_compra
+- id_orden (INT, NOT NULL, PK, AUTO_INCREMENT): Identificador de la orden.
+- folio_orden (VARCHAR(30), NOT NULL, UNIQUE): Folio único de la orden.
+- id_proveedor (INT, NOT NULL, FK -> proveedores): Proveedor al que se le compra.
+- id_usuario_crea (INT, NOT NULL, FK -> usuarios_sistema): Gerente que creó la orden.
+- estatus_orden (ENUM('Borrador', 'Enviada', 'Recibida', 'Cancelada'), DEFAULT 'Borrador'): Estado de la orden.
+- total_orden (DECIMAL(12,2), NOT NULL, DEFAULT 0.00, CHECK >= 0): Monto total de la compra.
+- observaciones (TEXT, NULL): Notas del pedido.
+- fecha_recepcion (DATETIME, NULL): Cuándo llegó la mercancía a la tienda.
+- fecha_alta (DATETIME, DEFAULT CURRENT_TIMESTAMP): Fecha de creación.
+- fecha_modificacion (DATETIME, DEFAULT CURRENT_TIMESTAMP ON UPDATE): Última actualización.
+
+TABLA: detalle_orden_compra
+- id_detalle (INT, NOT NULL, PK, AUTO_INCREMENT): Identificador del renglón.
+- id_orden (INT, NOT NULL, FK -> ordenes_compra): Orden a la que pertenece.
+- id_producto (INT, NOT NULL, FK -> inventario_productos): Producto pedido.
+- cantidad_solicitada (INT, NOT NULL, CHECK > 0): Cuántas piezas se pidieron.
+- costo_unitario (DECIMAL(10,2), NOT NULL, CHECK >= 0): Costo por pieza en esa orden.
+- fecha_alta (DATETIME, DEFAULT CURRENT_TIMESTAMP): Fecha de registro.
+- fecha_modificacion (DATETIME, DEFAULT CURRENT_TIMESTAMP ON UPDATE): Última actualización.
+
+
+--- MOVIMIENTOS DE INVENTARIO Y CORTES DE CAJA ---
+
+TABLA: movimientos_inventario
+- id_movimiento (INT, NOT NULL, PK, AUTO_INCREMENT): Identificador del movimiento.
+- id_producto (INT, NOT NULL, FK -> inventario_productos): Producto que entró o salió.
+- tipo_movimiento (ENUM('Compra', 'Venta', 'Merma', 'Uso Interno'), NOT NULL): Motivo del movimiento.
+- cantidad (INT, NOT NULL, CHECK > 0): Cuántas piezas se movieron.
+- precio_unitario (DECIMAL(10,2), NULL, CHECK >= 0): Precio del momento (obligatorio cuando es 'Venta').
+- id_usuario (INT, NOT NULL, FK -> usuarios_sistema): Quién registró el movimiento.
+- id_orden (INT, NULL, FK -> ordenes_compra): Orden de compra ligada (solo cuando entra por 'Compra').
+- observaciones (VARCHAR(255), NULL): Nota rápida del movimiento.
+- fecha_alta (DATETIME, DEFAULT CURRENT_TIMESTAMP): Fecha y hora exacta del movimiento.
+- fecha_modificacion (DATETIME, DEFAULT CURRENT_TIMESTAMP ON UPDATE): Última actualización.
+
+TABLA: cortes_caja
+- id_corte (INT, NOT NULL, PK, AUTO_INCREMENT): Identificador del corte.
+- fecha_corte (DATE, NOT NULL, UNIQUE): Día al que corresponde el corte.
+- total_ventas (DECIMAL(12,2), NOT NULL, DEFAULT 0.00, CHECK >= 0): Dinero total vendido en el día.
+- total_piezas_vendidas (INT, NOT NULL, DEFAULT 0, CHECK >= 0): Piezas vendidas en el día.
+- total_piezas_merma (INT, NOT NULL, DEFAULT 0, CHECK >= 0): Piezas perdidas o dañadas en el día.
+- total_piezas_uso_interno (INT, NOT NULL, DEFAULT 0, CHECK >= 0): Piezas usadas por la tienda.
+- estatus_corte (ENUM('Pendiente', 'Revisado'), NOT NULL, DEFAULT 'Pendiente'): Si ya lo revisó el gerente o no.
+- id_usuario_revisa (INT, NULL, FK -> usuarios_sistema): Gerente que validó el corte.
+- observaciones (TEXT, NULL): Comentarios del cierre.
+- fecha_revision (DATETIME, NULL): Cuándo se revisó el corte.
+- fecha_alta (DATETIME, DEFAULT CURRENT_TIMESTAMP): Fecha de registro.
+- fecha_modificacion (DATETIME, DEFAULT CURRENT_TIMESTAMP ON UPDATE): Última actualización.
+
+
+--- PERSONAL ---
+
+TABLA: horarios_empleado
+- id_horario (INT, NOT NULL, PK, AUTO_INCREMENT): Identificador del horario.
+- id_empleado (INT, NOT NULL, FK -> expediente_empleados): Empleado asignado.
+- dia_semana (ENUM('Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'), NOT NULL): Día de la semana.
+- hora_entrada (TIME, NOT NULL): Hora de entrada.
+- hora_salida (TIME, NOT NULL): Hora de salida (debe ser después de la entrada).
+- fecha_alta (DATETIME, DEFAULT CURRENT_TIMESTAMP): Fecha de registro.
+- fecha_modificacion (DATETIME, DEFAULT CURRENT_TIMESTAMP ON UPDATE): Última actualización.
+
+TABLA: asistencias
+- id_asistencia (INT, NOT NULL, PK, AUTO_INCREMENT): Identificador de la asistencia.
+- id_empleado (INT, NOT NULL, FK -> expediente_empleados): Empleado.
+- fecha_asistencia (DATE, NOT NULL): Día de trabajo.
+- hora_entrada_real (TIME, NULL): Hora real a la que llegó.
+- hora_salida_real (TIME, NULL): Hora real a la que salió.
+- estatus_asistencia (ENUM('Asistio', 'Retardo', 'Falta', 'Permiso'), NOT NULL, DEFAULT 'Falta'): Estatus del día.
+- observaciones (VARCHAR(255), NULL): Justificación o nota.
+- fecha_alta (DATETIME, DEFAULT CURRENT_TIMESTAMP): Fecha de registro.
+- fecha_modificacion (DATETIME, DEFAULT CURRENT_TIMESTAMP ON UPDATE): Última actualización.
+
+TABLA: incidencias_laborales
+- id_incidencia (INT, NOT NULL, PK, AUTO_INCREMENT): Identificador de la incidencia.
+- id_empleado (INT, NOT NULL, FK -> expediente_empleados): Empleado involucrado.
+- id_usuario_registra (INT, NOT NULL, FK -> usuarios_sistema): Quién levantó el reporte.
+- tipo_incidencia (ENUM('Incapacidad', 'Desaprobacion', 'Accidente', 'Conducta', 'Otro'), NOT NULL): Tipo de problema.
+- fecha_incidencia (DATE, NOT NULL): Fecha del suceso.
+- descripcion (TEXT, NOT NULL): Qué pasó.
+- estatus_incidencia (ENUM('Abierta', 'En Revision', 'Cerrada'), DEFAULT 'Abierta'): En qué va el caso.
+- fecha_alta (DATETIME, DEFAULT CURRENT_TIMESTAMP): Fecha de registro.
+- fecha_modificacion (DATETIME, DEFAULT CURRENT_TIMESTAMP ON UPDATE): Última actualización.
+
+
+--- COMUNICACIÓN Y REPORTES ---
+
+TABLA: reportes_gerente
+- id_reporte (INT, NOT NULL, PK, AUTO_INCREMENT): Identificador del reporte.
+- id_usuario_gerente (INT, NOT NULL, FK -> usuarios_sistema): Gerente que manda el mensaje.
+- categoria_reporte (ENUM('Personal', 'Inventario', 'Compras', 'Ventas', 'Sistema', 'Otro'), NOT NULL): Tema del reporte.
+- asunto (VARCHAR(120), NOT NULL): Título corto.
+- descripcion (TEXT, NOT NULL): Detalle de lo que se reporta o pide.
+- estatus_reporte (ENUM('Pendiente', 'Atendido'), NOT NULL, DEFAULT 'Pendiente'): Si el admin ya respondió o no.
+- id_usuario_admin (INT, NULL, FK -> usuarios_sistema): Administrador que atendió el reporte.
+- respuesta_admin (TEXT, NULL): Respuesta del administrador.
+- fecha_atencion (DATETIME, NULL): Cuándo se atendió.
+- fecha_alta (DATETIME, DEFAULT CURRENT_TIMESTAMP): Fecha de registro.
+- fecha_modificacion (DATETIME, DEFAULT CURRENT_TIMESTAMP ON UPDATE): Última actualización.
+
+TABLA: incidentes_tienda
+- id_incidente_tienda (INT, NOT NULL, PK, AUTO_INCREMENT): Identificador del incidente.
+- id_usuario_reporta (INT, NOT NULL, FK -> usuarios_sistema): Empleado que avisa del problema.
+- tipo_incidente (ENUM('Stock', 'Situacion en Tienda'), NOT NULL): Si es falta de producto o algo en el local.
+- id_producto (INT, NULL, FK -> inventario_productos): Producto relacionado (opcional, solo si es de 'Stock').
+- descripcion (TEXT, NOT NULL): Qué está pasando.
+- estatus_incidente (ENUM('Pendiente', 'Revisado', 'Resuelto'), NOT NULL, DEFAULT 'Pendiente'): Seguimiento del gerente.
+- id_usuario_revisa (INT, NULL, FK -> usuarios_sistema): Gerente que revisó el aviso.
+- comentario_revision (TEXT, NULL): Qué solución se dio.
+- fecha_revision (DATETIME, NULL): Cuándo se revisó.
+- fecha_alta (DATETIME, DEFAULT CURRENT_TIMESTAMP): Fecha de registro.
+- fecha_modificacion (DATETIME, DEFAULT CURRENT_TIMESTAMP ON UPDATE): Última actualización.
+
+
+3. REGLAS DE INTEGRIDAD Y RESTRICCIONES
+
+1. Llaves foráneas con ON DELETE RESTRICT ON UPDATE CASCADE: Impiden borrar roles, usuarios, proveedores, especies, categorías o marcas que ya estén en uso.
+2. fk_empleados_usuarios con ON DELETE SET NULL ON UPDATE CASCADE: Si se borra la cuenta de usuario, el expediente del trabajador no se pierde.
+3. Borrado en cascada (ON DELETE CASCADE): Solo se usa en tablas dependientes como detalle_orden_compra, horarios_empleado, asistencias e incidencias_laborales si se llega a eliminar el registro principal.
+4. Validaciones CHECK en inventario y precios: Impiden guardar stock_actual, stock_minimo, precio_publico o costo_unitario con números negativos.
+5. Validaciones CHECK en movimientos y cortes: Obligan a que cantidad sea mayor a 0, que toda 'Venta' tenga precio_unitario, y que ningún corte o incidente marcado como revisado quede sin fecha de revisión.
+6. Llaves únicas (UNIQUE): Evitan duplicar horarios el mismo día para un empleado, pasar dos veces asistencia en la misma fecha o abrir dos cortes de caja el mismo día.
+7. Baja lógica: Se usa ENUM('Activo', 'Inactivo', 'Baja Logica') en expediente_empleados y banderas TINYINT(1) (1 = Activo, 0 = Inactivo) en cuentas, productos y proveedores para no borrar datos históricos.
