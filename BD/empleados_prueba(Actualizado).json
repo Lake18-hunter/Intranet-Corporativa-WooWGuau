@@ -1,0 +1,68 @@
+[
+  {
+    "id_usuario": 1,
+    "numero_empleado": "EMP001",
+    "nombre_empleado": "Yessica",
+    "apellido_paterno": "Gonzalez",
+    "apellido_materno": "Garcia",
+    "telefono_contacto": "5551234567",
+    "puesto_trabajo": "Gerente",
+    "fecha_ingreso": "2026-01-15",
+    "estatus_laboral": "Activo"
+  },
+  {
+    "id_usuario": 2,
+    "numero_empleado": "EMP002",
+    "nombre_empleado": "Juan",
+    "apellido_paterno": "Perez",
+    "apellido_materno": "Lopez",
+    "telefono_contacto": "5559876543",
+    "puesto_trabajo": "Vendedor de Piso",
+    "fecha_ingreso": "2026-02-01",
+    "estatus_laboral": "Activo"
+  },
+  {
+    "id_usuario": 3,
+    "numero_empleado": "EMP003",
+    "nombre_empleado": "Carlos",
+    "apellido_paterno": "Mendoza",
+    "apellido_materno": "Ruiz",
+    "telefono_contacto": "5552345678",
+    "puesto_trabajo": "Administrador General",
+    "fecha_ingreso": "2026-01-10",
+    "estatus_laboral": "Activo"
+  },
+  {
+    "id_usuario": 4,
+    "numero_empleado": "EMP004",
+    "nombre_empleado": "Sofía",
+    "apellido_paterno": "Ramírez",
+    "apellido_materno": "Ortiz",
+    "telefono_contacto": "5553456789",
+    "puesto_trabajo": "Cajera y Atención al Cliente",
+    "fecha_ingreso": "2026-03-12",
+    "estatus_laboral": "Activo"
+  },
+  {
+    "id_usuario": null,
+    "numero_empleado": "EMP005",
+    "nombre_empleado": "Valeria",
+    "apellido_paterno": "Torres",
+    "apellido_materno": "Vega",
+    "telefono_contacto": "5554567890",
+    "puesto_trabajo": "Auxiliar de Almacén",
+    "fecha_ingreso": "2026-11-15",
+    "estatus_laboral": "Activo"
+  },
+  {
+    "id_usuario": null,
+    "numero_empleado": "EMP006",
+    "nombre_empleado": "Diego",
+    "apellido_paterno": "Navarro",
+    "apellido_materno": "Cruz",
+    "telefono_contacto": "5555678901",
+    "puesto_trabajo": "Vendedor de Piso",
+    "fecha_ingreso": "2026-04-05",
+    "estatus_laboral": "Inactivo"
+  }
+]
